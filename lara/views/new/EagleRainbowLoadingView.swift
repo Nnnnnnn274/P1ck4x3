@@ -27,12 +27,12 @@ enum EagleAppearanceMode: String, CaseIterable, Identifiable {
 }
 
 enum EagleVisualTheme {
-    static let accent = Color(red: 0.34, green: 0.29, blue: 0.88)
+    static let accent = Color(red: 0.16, green: 0.91, blue: 0.47)
 
     static let accentUIColor = UIColor { traits in
         traits.userInterfaceStyle == .dark
-            ? UIColor(red: 0.58, green: 0.50, blue: 1.0, alpha: 1)
-            : UIColor(red: 0.29, green: 0.24, blue: 0.78, alpha: 1)
+            ? UIColor(red: 0.36, green: 1.0, blue: 0.61, alpha: 1)
+            : UIColor(red: 0.00, green: 0.48, blue: 0.20, alpha: 1)
     }
 
     static func secondaryText(for colorScheme: ColorScheme) -> Color {
@@ -377,15 +377,13 @@ struct EagleHeaderBar: View {
 
 enum EagleSpectrumStyle {
     static let colors: [Color] = [
-        .cyan,
-        .blue,
-        .purple,
-        .pink,
-        .red,
-        .orange,
-        .yellow,
-        .green,
-        .cyan,
+        Color(red: 0.04, green: 0.30, blue: 0.13),
+        Color(red: 0.08, green: 0.57, blue: 0.25),
+        Color(red: 0.16, green: 0.91, blue: 0.47),
+        Color(red: 0.52, green: 1.00, blue: 0.72),
+        Color(red: 0.16, green: 0.91, blue: 0.47),
+        Color(red: 0.08, green: 0.57, blue: 0.25),
+        Color(red: 0.04, green: 0.30, blue: 0.13),
     ]
 
     static var gradient: LinearGradient {
@@ -399,23 +397,18 @@ enum EagleSpectrumStyle {
     static var wordmarkGradient: LinearGradient {
         LinearGradient(
             colors: [
-                Color(red: 0.13, green: 0.72, blue: 0.90),
-                Color(red: 0.19, green: 0.55, blue: 0.96),
-                Color(red: 0.33, green: 0.42, blue: 0.94),
-                Color(red: 0.52, green: 0.34, blue: 0.91),
-                Color(red: 0.74, green: 0.30, blue: 0.85),
-                Color(red: 0.93, green: 0.33, blue: 0.63),
-                Color(red: 0.98, green: 0.44, blue: 0.42),
-                Color(red: 0.99, green: 0.62, blue: 0.30),
+                Color(red: 0.03, green: 0.28, blue: 0.12),
+                Color(red: 0.07, green: 0.50, blue: 0.22),
+                Color(red: 0.12, green: 0.76, blue: 0.36),
+                Color(red: 0.20, green: 0.96, blue: 0.52),
+                Color(red: 0.52, green: 1.00, blue: 0.72),
             ],
             startPoint: .leading,
             endPoint: .trailing
         )
     }
 
-    // Monochrome, adaptive navigation tint (black in light, white in dark) so
-    // Back/Close match the rest of the neutral chrome.
-    static let navigationTintColor = UIColor.label
+    static let navigationTintColor = EagleVisualTheme.accentUIColor
 
     static func configureGlobalNavigationAppearance() {
         UINavigationBar.appearance().tintColor = navigationTintColor

@@ -1,14 +1,12 @@
-This is a placeholder for the P1CK4X3 icon image.
-The actual icon should be the image provided by the user showing:
-- Dark navy/black background with cyan neon glow border
-- Pickaxe with 3D shading (white, cyan, and dark blue)
-- iPhone with Apple logo and checklist (jailbreak, customize, tweak, your iOS)
-- Settings gear on the left
-- Bold "P1CK4X3" text in white/cyan with lightning bolt accents at bottom
-- Neon glow effects throughout
+P1CK4X3 uses an original green pickaxe mark.
 
-To use this icon:
-1. Download the image from the user's source
-2. Convert to PNG format (1024x1024 recommended)
-3. Use appicon.co or similar to generate all iOS icon sizes
-4. Add to lara/other/media.xcassets/AppIcon.appiconset/
+The three 1024×1024 iOS app-icon variants live in:
+lara/other/media.xcassets/AppIcon.appiconset/
+
+- P1CK4X3-Light.png
+- P1CK4X3-Dark.png
+- P1CK4X3-Tinted.png
+
+The mark intentionally has no small text beyond the P monogram, so it remains
+legible on the Home Screen. Its dark-forest background, mint pickaxe, and
+rounded border match the in-app P1CK4X3 interface.

@@ -69,7 +69,7 @@ struct LaraAccessView: View {
             HStack(alignment: .top, spacing: 12) {
                 Image(systemName: "lock.shield.fill")
                     .font(.title3)
-                    .foregroundStyle(.blue)
+                    .foregroundStyle(EagleVisualTheme.accent)
                     .frame(width: 28)
 
                 VStack(alignment: .leading, spacing: 4) {
