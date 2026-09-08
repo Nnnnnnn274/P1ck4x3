@@ -1,11 +1,11 @@
-# Eagle architecture notes
+# P1ck4x3 architecture notes
 
-Eagle is an independent AGPL-3.0 modification of Lara. The `upstream` remote is
-kept read-only so Eagle changes cannot accidentally be pushed to Lara.
+P1ck4x3 is an independent AGPL-3.0 modification of Lara. The `upstream` remote is
+kept read-only so P1ck4x3 changes cannot accidentally be pushed to Lara.
 
 ## App identity
 
-- Display name and product: `Eagle`
+- Display name and product: `P1ck4x3`
 - Bundle identifier: `com.leonardobaptiste.laracustom`
 - Xcode project and scheme: `lara.xcodeproj` / `lara`
 - Primary navigation: `LaraHomeView`
@@ -13,18 +13,18 @@ kept read-only so Eagle changes cannot accidentally be pushed to Lara.
 
 Internal Lara-prefixed Swift symbols and the `lara.log` filename remain where a
 rename would add risk without changing the user experience. New user-facing
-copy should say Eagle.
+copy should say P1ck4x3.
 
 ## Public beta features
 
-- Complete Styles and Eagle Match
+- Complete Styles and P1ck4x3 Match
 - Animated and community wallpapers
 - Wallet card artwork
 - Passcode themes
 - Icon Studio (beta)
 - Six-app Dock experiments
 - Island Aura (experimental native route plus compact fallback)
-- Eagle System: Guardian, Scenes and safe sharing
+- P1ck4x3 System: Guardian, Scenes and safe sharing
 
 ## Adding a feature
 

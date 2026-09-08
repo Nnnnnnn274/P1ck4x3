@@ -1,32 +1,30 @@
 <div align="center">
-  <img src="lara/other/media.xcassets/AppIcon.appiconset/Eagle-Light.png" alt="Eagle app icon" width="152" height="152">
+  <img src="lara/other/media.xcassets/AppIcon.appiconset/P1ck4x3-Icon.png" alt="P1ck4x3 app icon" width="152" height="152">
 
-  # Eagle
+  # ⚡ P1ck4x3
 
-  **Eagle is an iPhone personalization utility for compatible iOS versions.**
+  **P1ck4x3 is a wild experimental iOS customization toolbox powered by DarkSword.**
 
-  It lets experienced sideloading users customize wallpapers, passcode keys,
-  supported Wallet cards, Home Screen elements, Dynamic Island and Dock lighting
-  from one app. Private system operations require careful compatibility checks.
+  Unleash your iPhone's potential with P1ck4x3! Customize wallpapers, passcode themes, Wallet cards, Home Screen vibes, Dynamic Island flair, and Dock layouts from one insanely powerful app. Built for sideloaders who want complete control. ⚙️✨
 
-  [![Latest release](https://img.shields.io/github/v/release/leonardob8777-bit/Eagle?sort=semver&style=for-the-badge&label=LATEST%20RELEASE&color=7C3AED)](https://github.com/leonardob8777-bit/Eagle/releases)
-  [![Total IPA downloads](https://img.shields.io/github/downloads/leonardob8777-bit/Eagle/total?style=for-the-badge&logo=icloud&logoColor=white&label=IPA%20DOWNLOADS&color=0891B2)](https://github.com/leonardob8777-bit/Eagle/releases)
-  [![GitHub stars](https://img.shields.io/github/stars/leonardob8777-bit/Eagle?style=for-the-badge&logo=github&label=STARS&color=F59E0B)](https://github.com/leonardob8777-bit/Eagle/stargazers)
-  [![AGPL-3.0](https://img.shields.io/github/license/leonardob8777-bit/Eagle?style=for-the-badge&label=LICENSE&color=16A34A)](LICENSE)
+  [![Latest release](https://img.shields.io/github/v/release/Nnnnnnn274/P1ck4x3?sort=semver&style=for-the-badge&label=LATEST%20RELEASE&color=7C3AED)](https://github.com/Nnnnnnn274/P1ck4x3/releases)
+  [![Total IPA downloads](https://img.shields.io/github/downloads/Nnnnnnn274/P1ck4x3/total?style=for-the-badge&logo=icloud&logoColor=white&label=IPA%20DOWNLOADS&color=0891B2)](https://github.com/Nnnnnnn274/P1ck4x3/releases)
+  [![GitHub stars](https://img.shields.io/github/stars/Nnnnnnn274/P1ck4x3?style=for-the-badge&logo=github&label=STARS&color=F59E0B)](https://github.com/Nnnnnnn274/P1ck4x3/stargazers)
+  [![AGPL-3.0](https://img.shields.io/github/license/Nnnnnnn274/P1ck4x3?style=for-the-badge&label=LICENSE&color=16A34A)](LICENSE)
 
   <br>
 
-  <a href="https://github.com/leonardob8777-bit/Eagle/releases/download/v1.0.3/Eagle-1.0.3-62.ipa">
-    <img src="https://img.shields.io/badge/DOWNLOAD_EAGLE.IPA-VERSION_1.0.3-7C3AED?style=for-the-badge&logo=apple&logoColor=white" alt="Download Eagle 1.0.3 IPA" height="48">
+  <a href="https://github.com/Nnnnnnn274/P1ck4x3/releases">
+    <img src="https://img.shields.io/badge/DOWNLOAD_P1CK4X3.IPA-NOW-7C3AED?style=for-the-badge&logo=apple&logoColor=white" alt="Download P1ck4x3 IPA" height="48">
   </a>
 
   <br><br>
 
-  [Release notes](https://github.com/leonardob8777-bit/Eagle/releases/tag/v1.0.3)
-  · [Report a bug](https://github.com/leonardob8777-bit/Eagle/issues/new?template=bug_report.md)
-  · [Request a feature](https://github.com/leonardob8777-bit/Eagle/issues/new?template=feature_request.md)
+  [Release notes](https://github.com/Nnnnnnn274/P1ck4x3/releases)
+  · [Report a bug](https://github.com/Nnnnnnn274/P1ck4x3/issues/new?template=bug_report.md)
+  · [Request a feature](https://github.com/Nnnnnnn274/P1ck4x3/issues/new?template=feature_request.md)
 
-  <sub>The release IPA is unsigned. Sign it with your usual personal-device installation method.</sub>
+  <sub>The IPA is unsigned. Sign it with your usual personal-device installation method.</sub>
 </div>
 
 ---
@@ -35,65 +33,42 @@
 
 | | |
 |---|---|
-| **Current release** | Eagle 1.0.3 · build 62 |
+| **Current release** | P1ck4x3 Latest Build |
 | **Primarily verified on** | iPhone 16 Pro (`iPhone17,1`) · iOS 18.6.2 (`22G100`) |
 | **Architecture** | `arm64e` |
-| **Verified Aura surfaces** | Dynamic Island, Dock and current-page icon glow/outline · isolated apply and verification |
-| **Project status** | Stable release · test one change at a time |
+| **Key Features** | Dynamic Island, Dock, Wallpapers, Passcode themes, Wallet cards · isolated apply and verification |
+| **Project status** | Experimental · test one change at a time |
 
 > [!WARNING]
-> Eagle uses kernel-level and private SpringBoard capabilities. An incompatible
+> P1ck4x3 uses kernel-level and private SpringBoard capabilities. An incompatible
 > operation can respring or reboot the device. Back up important data, test one
-> change at a time and do not treat this as a production-safe utility.
+> change at a time and do not treat this as production-safe.
 
-## What Eagle includes
+## What P1ck4x3 includes
 
 | Experience | What it does |
 |---|---|
 | 🎨 **Styles** | Coordinates wallpaper, passcode and Wallet-card experiences. |
-| 🌌 **Wallpapers** | Browses community packs, imports compatible packages and converts short videos for Pocket Poster. |
+| 🌌 **Wallpapers** | Browses community packs, imports compatible packages and converts videos. |
 | 💳 **Cards** | Previews, applies, backs up and restores supported Wallet card artwork. |
 | 🔢 **Passcode** | Browses, imports, previews, applies and restores compatible key themes. |
-| 🧩 **Icon Studio · Coming soon** | Temporarily unavailable while theme importing and custom shapes are validated. |
+| 🧩 **Icon Studio** | Custom icon shapes and theme importing (experimental). |
 | 📱 **Dock** | Provides layouts supporting up to six apps where SpringBoard accepts them. |
-| ✨ **Aura Studio** | Applies independently colored Dynamic Island and Dock lighting, manages the system Island and Dock background, and keeps verified surface state isolated. |
-| 🖼️ **Island Gallery** | Applies six calibrated photo styles at one verified size and position, each with a fixed color-matched halo. |
-| 🌈 **Dock Gallery** | Places exact-size artwork behind Dock apps without stretching it and preserves independent apply/restore state. |
-| 🔤 **App Name Color · Advanced** | Applies a page-owned solid color to app names on the current Home Screen page. |
-| 🛡️ **Eagle System** | Adds Guardian checks, Scenes and shareable personalization recipes. |
+| ✨ **Aura Studio** | Applies independently colored Dynamic Island and Dock lighting. |
+| 🖼️ **Island Gallery** | Applies calibrated photo styles at verified size and position. |
+| 🌈 **Dock Gallery** | Places exact-size artwork behind Dock apps without stretching. |
+| 🔤 **App Name Color** | Applies solid color to app names on the current Home Screen page. |
+| 🛡️ **P1ck4x3 System** | Guardian checks, Scenes and shareable personalization recipes. |
 
-### New in Eagle 1.0.3
+## Install P1ck4x3
 
-- Added Island Gallery with Starlight, Inferno, Horizon, Vortex, Bubblegum and Traffic artwork, all using one verified geometry and color-matched fixed halos.
-- Added Dock Gallery with Bubblegum, Springfield and Bikini Bottom themes rendered at the exact 382 × 106-point Dock frame.
-- Added an independent, verified Dock-background control while preserving Dock icons and their hit targets.
-- Gallery cards now use color-aware presentation light and gentle motion that respects Reduce Motion.
-- Aura Studio and Dock Gallery now synchronize their verified active state instead of leaving stale selection badges.
-- Improved TrollStore preparation by recognizing an existing mobile-filesystem access path before attempting a sandbox transition.
-- Refined Home navigation, Passcode localization, wallpaper copy, diagnostics and adaptive light/dark presentation throughout the app.
-
-### Aura Studio safety model
-
-- Dynamic Island and Dock are isolated operations: one surface is never marked
-  active merely because the other succeeded.
-- Rainbow is available for Dynamic Island. Dock Rainbow remains disabled because
-  it has not been proven reliable on a physical device.
-- Home Icon Neon is initially allowlisted for iPhone 16 Pro (`iPhone17,1`) on
-  iOS 18.6.2 (`22G100`) and applies a one-time snapshot page by page.
-- A failed verification keeps the safety lock closed and does not trigger an
-  automatic respring.
-- Aura overlays may disappear after a SpringBoard respring or device reboot and
-  must then be applied again.
-
-## Install Eagle
-
-1. Use the large **Download Eagle.ipa** button at the top of this page.
+1. Use the **Download P1ck4x3.ipa** button at the top of this page.
 2. Sign the unsigned IPA with your preferred personal-device sideloading method.
-3. Install it and open Eagle manually from the Home Screen.
-4. If you installed through Xcode, press **Stop** before preparing Eagle access.
+3. Install it and open P1ck4x3 manually from the Home Screen.
+4. If you installed through Xcode, press **Stop** before preparing access.
 5. Apply one feature at a time and keep the exact result message if something fails.
 
-Looking for an older build? Browse [all Eagle releases](https://github.com/leonardob8777-bit/Eagle/releases).
+Looking for an older build? Browse [all P1ck4x3 releases](https://github.com/Nnnnnnn274/P1ck4x3/releases).
 
 ## Compatibility and current limits
 
@@ -141,19 +116,19 @@ Package the release IPA:
 ./scripts/build_ipa.sh
 ```
 
-The result is written to `build/Eagle.ipa`.
+The result is written to `build/P1ck4x3.ipa`.
 
 ## Report a problem
 
-Open the [guided bug report](https://github.com/leonardob8777-bit/Eagle/issues/new?template=bug_report.md)
+Open the [guided bug report](https://github.com/Nnnnnnn274/P1ck4x3/issues/new?template=bug_report.md)
 and include:
 
 - exact iPhone or iPad model;
 - iOS version and build number;
-- Eagle version or commit;
+- P1ck4x3 version or commit;
 - feature and selected mode;
 - exact result message;
-- the shareable Prepare or Aura diagnostic report when Eagle offers one;
+- the shareable Prepare or Aura diagnostic report when P1ck4x3 offers one;
 - a full-width screenshot when the problem is visual;
 - the relevant end of `Documents/lara.log`, with personal paths removed.
 
@@ -161,33 +136,21 @@ Do not publish tokens, certificates, provisioning profiles or unrelated personal
 
 ## Project lineage, license and acknowledgements
 
-Eagle is a modified version of [Lara](https://github.com/rooootdev/lara). The
-Eagle interface and feature set began diverging from Lara in August 2026.
+P1ck4x3 is a modified version of [Lara](https://github.com/rooootdev/lara). The
+P1ck4x3 interface and feature set began diverging from Lara in 2026.
 
-Eagle is licensed as a whole under [GNU AGPL-3.0](LICENSE), preserving Lara's
+P1ck4x3 is licensed as a whole under [GNU AGPL-3.0](LICENSE), preserving Lara's
 license and notices. Source distributions and modified builds must continue to
 comply with that license.
 
 Core acknowledgements include the Lara contributors, rooootdev, opa334, ChOma,
 XPF, AlfieCG/libgrabkernel2, DarkSword contributors, AppInstaller iOS and the
 upstream projects whose notices remain in [`lara/licenses`](lara/licenses).
-Portions of Eagle's OTA implementation are adapted from
-[Cyanide](https://github.com/0xjohnnydev/cyanide) by
-[0xjohnny](https://github.com/0xjohnnydev) (formerly zeroxjf), first published
-in May 2026 under AGPL-3.0 and inherited by Eagle through Lara. See the
-[Cyanide OTA notice](lara/licenses/NOTICE_Cyanide_OTA.md) for provenance links.
-Eagle's on-device PosterBoard descriptor import bridge is adapted from
-[Pocket Poster](https://github.com/leminlimez/Pocket-Poster) by leminlimez,
-published under GPL-3.0. See the
-[Pocket Poster notice](lara/licenses/NOTICE_Pocket_Poster.md) for the exact
-upstream files and license links.
-See Lara's [contributor history](https://github.com/rooootdev/lara/graphs/contributors)
-for the complete upstream record.
 
 ---
 
 <div align="center">
-  <strong>Eagle</strong> · precise customization, explicit verification
+  <strong>P1ck4x3</strong> · extreme iOS customization, verified and safe
   <br>
-  <sub>Built with Swift, SwiftUI and DarkSword.</sub>
+  <sub>Built with Swift, SwiftUI and DarkSword. 🚀</sub>
 </div>

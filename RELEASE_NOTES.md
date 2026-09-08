@@ -1,6 +1,6 @@
-# Eagle 1.0.3 (62)
+# P1ck4x3 Latest Release
 
-Eagle 1.0.3 expands visual customization with dedicated Island and Dock art galleries while keeping every live SpringBoard change isolated, verified, and recoverable.
+P1ck4x3 expands visual customization with dedicated Island and Dock art galleries while keeping every live SpringBoard change isolated, verified, and recoverable.
 
 ## What changed
 
@@ -21,9 +21,3 @@ Eagle 1.0.3 expands visual customization with dedicated Island and Dock art gall
 - TrollStore preparation was additionally validated on iPhone 14 Pro Max with iOS 17.0.
 - Live Island and Dock art remains limited to verified iOS 17/18 SpringBoard routes.
 - The IPA is unsigned and must be signed with the user's normal installation method.
-
-## Español
-
-Eagle 1.0.3 añade **Galería Island** con seis diseños calibrados y **Galería Dock** con tres temas al tamaño exacto del Dock. Todas las islas conservan la misma geometría verificada de Starlight y cada diseño usa un halo fijo acorde con su color principal. También se añadió un control independiente para ocultar o restaurar el fondo del Dock sin quitar los iconos.
-
-Las galerías ahora se sincronizan con Aura Studio para evitar indicadores activos desactualizados. La preparación con TrollStore reconoce el acceso existente al sistema de archivos móvil antes de intentar una transición de sandbox. Además, se mejoraron la navegación de Inicio, la ubicación de acciones, los diagnósticos, la localización de Código y Fondos, y las superficies adaptativas en modo claro y oscuro.
