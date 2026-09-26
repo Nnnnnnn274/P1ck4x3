@@ -33,6 +33,43 @@ struct LaraHomeView: View {
 
                     if normalizedToolQuery.isEmpty {
                         VStack(alignment: .leading, spacing: 20) {
+                            NavigationLink(destination: UltratorView()) {
+                                HStack(spacing: 15) {
+                                    Image(systemName: "slider.horizontal.3")
+                                        .font(.title2.weight(.bold))
+                                        .foregroundStyle(.white)
+                                        .frame(width: 58, height: 58)
+                                        .background(
+                                            LinearGradient(
+                                                colors: [.cyan, .purple, .pink],
+                                                startPoint: .topLeading,
+                                                endPoint: .bottomTrailing
+                                            ),
+                                            in: RoundedRectangle(cornerRadius: 17)
+                                        )
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text("Ultrator")
+                                            .font(.title2.bold())
+                                            .foregroundStyle(.primary)
+                                        Text(LaraL10n.text(
+                                            en: "Edit Home Screen, Dock, and Lock Screen",
+                                            es: "Edita Inicio, Dock y pantalla bloqueada"
+                                        ))
+                                        .font(.subheadline)
+                                        .foregroundStyle(.secondary)
+                                    }
+                                    Spacer(minLength: 0)
+                                    Image(systemName: "chevron.right")
+                                        .font(.caption.weight(.semibold))
+                                        .foregroundStyle(.secondary)
+                                }
+                                .padding(18)
+                                .background(Color(uiColor: .secondarySystemGroupedBackground),
+                                            in: RoundedRectangle(cornerRadius: 22))
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityIdentifier("ultrator")
+
                             NavigationLink(destination: auraStudioDestination) {
                                 AuraStudioHeroCard(
                                     title: "Aura Studio",
@@ -251,7 +288,7 @@ struct LaraHomeView: View {
         Button { showingLaboratory = true } label: {
             LaraToolRow(
                 title: LaraL10n.text(en: "Laboratory tools", es: "Herramientas de Laboratorio"),
-                subtitle: "Kernelcache · RemoteCall · Control Center",
+                subtitle: "Kernelcache · RemoteCall · Lock Screen",
                 systemImage: "testtube.2",
                 accent: .primary
             )
@@ -485,7 +522,7 @@ struct LaraHomeView: View {
     private var availableToolRoutes: [LaraHomeToolRoute] {
         LaraHomeToolRoute.allCases.filter { route in
             switch route {
-            case .auraStudio, .completeStyles, .wallpapers,
+            case .ultrator, .auraStudio, .completeStyles, .wallpapers,
                     .homeLabelColor, .cards, .passcode, .icons, .dock,
                     .islandGallery, .dockGallery, .hideSurfaces:
                 return true
@@ -653,6 +690,8 @@ struct LaraHomeView: View {
     @ViewBuilder
     private func toolDestination(for route: LaraHomeToolRoute) -> some View {
         switch route {
+        case .ultrator:
+            UltratorView()
         case .completeStyles:
             CompleteStylesView()
         case .eagleSystem:
@@ -715,6 +754,7 @@ struct LaraHomeView: View {
 }
 
 private enum LaraHomeToolRoute: String, CaseIterable, Identifiable {
+    case ultrator
     case auraStudio
     case completeStyles
     case eagleSystem
@@ -733,6 +773,7 @@ private enum LaraHomeToolRoute: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
+        case .ultrator: return "Ultrator"
         case .completeStyles: return LaraL10n.text(en: "Styles", es: "Estilos")
         case .eagleSystem: return "P1ck4x3 System"
         case .wallpapers: return LaraL10n.text(en: "Wallpapers", es: "Fondos")
@@ -756,6 +797,8 @@ private enum LaraHomeToolRoute: String, CaseIterable, Identifiable {
 
     var subtitle: String {
         switch self {
+        case .ultrator:
+            return LaraL10n.text(en: "Home Screen, Dock, and Lock Screen editor", es: "Editor de Inicio, Dock y pantalla bloqueada")
         case .hideSurfaces:
             return LaraL10n.text(en: "System visibility", es: "Visibilidad del sistema")
         case .completeStyles:
@@ -793,6 +836,7 @@ private enum LaraHomeToolRoute: String, CaseIterable, Identifiable {
 
     var systemImage: String {
         switch self {
+        case .ultrator: return "slider.horizontal.3"
         case .hideSurfaces: return "eye.slash.fill"
         case .completeStyles: return "sparkles"
         case .eagleSystem: return "checkmark.shield.fill"
@@ -811,6 +855,7 @@ private enum LaraHomeToolRoute: String, CaseIterable, Identifiable {
 
     var accent: Color {
         switch self {
+        case .ultrator: return .cyan
         case .hideSurfaces: return .indigo
         case .completeStyles: return Color(red: 0.33, green: 0.25, blue: 0.82)
         case .eagleSystem: return .indigo
@@ -829,6 +874,7 @@ private enum LaraHomeToolRoute: String, CaseIterable, Identifiable {
 
     var keywords: String {
         switch self {
+        case .ultrator: return "ultra ultrator editor home inicio dock lock bloqueo screen pantalla customize personalizar"
         case .hideSurfaces: return "hide dock island ocultar isla fondo background visibility visibilidad"
         case .completeStyles: return "style styles estilo estilos complete completo visual"
         case .eagleSystem: return "system sistema guardian recovery recuperación"

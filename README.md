@@ -50,6 +50,7 @@
 
 | Experience | What it does |
 |---|---|
+| 🎛️ **Ultrator** | Picks Home Screen, Dock or Lock Screen from a phone preview; drafts app name color and Dock capacity, then opens the matching editor to apply. |
 | 🎨 **Styles** | Coordinates wallpaper, passcode and Wallet-card experiences. |
 | 🌌 **Wallpapers** | Browses community packs, imports compatible packages and converts short videos for Pocket Poster. |
 | 💳 **Cards** | Previews, applies, backs up and restores supported Wallet card artwork. |

@@ -132,8 +132,8 @@ private struct EagleBeta10AccessView: View {
                                     accessRow(
                                         title: LaraL10n.text(en: "Laboratory", es: "Laboratorio"),
                                         subtitle: LaraL10n.text(
-                                            en: "Offsets, Kernelcache, RemoteCall and Control Center",
-                                            es: "Offsets, Kernelcache, RemoteCall y Centro de control"
+                                            en: "Offsets, Kernelcache, RemoteCall and Lock Screen",
+                                            es: "Offsets, Kernelcache, RemoteCall y pantalla bloqueada"
                                         ),
                                         systemImage: "flask.fill",
                                         accent: .green
