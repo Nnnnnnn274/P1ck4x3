@@ -1,0 +1,36 @@
+Eagle Dynamic Notifications
+
+Native SwiftUI/UIKit/Core Image port of the capsule, droplet and expanding
+notification interaction in rit3zh/expo-dynamic-notifications:
+https://github.com/rit3zh/expo-dynamic-notifications
+Reference revision: 5de059a5cbefbe28c14efbe785166665a7c70bc5
+
+Eagle uses its own native implementation, with no Expo, React Native, Skia,
+Reanimated, fonts, avatars or network dependencies from that project.
+The reference repository's license is reproduced below.
+
+Ported reference logic: get-notification-layout.ts,
+build-notification-geometry.ts, build-goo-matrix.ts, neck-profile.ts,
+notification.consts.ts, gooey.tsx, springUtils.ts and the enter/return timeline.
+
+The MIT License (MIT)
+
+Copyright (c) 2015-present 650 Industries, Inc. (aka Expo)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

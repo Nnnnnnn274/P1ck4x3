@@ -71,14 +71,14 @@ struct LiquidGlassView: View {
             
             gpCurrentDict = try NSMutableDictionary(contentsOf: URL(fileURLWithPath: gpCurrentPath), error: ())
         } catch {
-            Alertinator.shared.alert(title: "Failed to load Global Preferences data!", body: "Please restart the app and try again.")
+            Alertinator.shared.notice(title: "Failed to load Global Preferences data!", body: "Please restart the app and try again.", succeeded: false)
         }
     }
     
     // MARK: applying/reloading functions
     func applyLiquidGlass() {
         guard mgr.sbxready || mgr.vfsready else {
-            Alertinator.shared.alert(title: "Failed to enable Liquid Glass Tweaks!", body: "Eagle access is not ready.")
+            Alertinator.shared.notice(title: "Failed to enable Liquid Glass Tweaks!", body: "Eagle access is not ready.", succeeded: false)
             return
         }
         do {
@@ -86,18 +86,18 @@ struct LiquidGlassView: View {
             let result = mgr.lara_overwritefile(target: gpCurrentPath, data: gpData)
             
             if result.ok {
-                Alertinator.shared.alert(title: "Successfully applied Liquid Glass Tweaks!", body: "Reboot your device to see any changes")
+                Alertinator.shared.notice(title: "Successfully applied Liquid Glass Tweaks!", body: "Reboot your device to see any changes", succeeded: true)
             } else {
                 throw "Overwrite failed: \(result.message)"
             }
         } catch {
-            Alertinator.shared.alert(title: "Failed to enable Liquid Glass Tweaks!", body: "\(error)")
+            Alertinator.shared.notice(title: "Failed to enable Liquid Glass Tweaks!", body: "\(error)", succeeded: false)
         }
     }
     
     func restoreLiquidGlass() {
         guard mgr.sbxready || mgr.vfsready else {
-            Alertinator.shared.alert(title: "Failed to restore Liquid Glass!", body: "Eagle access is not ready.")
+            Alertinator.shared.notice(title: "Failed to restore Liquid Glass!", body: "Eagle access is not ready.", succeeded: false)
             return
         }
         do {
@@ -112,12 +112,12 @@ struct LiquidGlassView: View {
                     throw "Overwrite failed: \(result.message)"
                 }
                 gpCurrentDict = restored
-                Alertinator.shared.alert(title: "Successfully restored Liquid Glass!", body: "Reboot your device to see any changes")
+                Alertinator.shared.notice(title: "Successfully restored Liquid Glass!", body: "Reboot your device to see any changes", succeeded: true)
             } else {
                 throw "No Global Prefs file found!"
             }
         } catch {
-            Alertinator.shared.alert(title: "Failed to restore Liquid Glass!", body: "\(error)")
+            Alertinator.shared.notice(title: "Failed to restore Liquid Glass!", body: "\(error)", succeeded: false)
         }
     }
     

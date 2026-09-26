@@ -19,6 +19,7 @@ struct LaraHomeView: View {
     @State private var flashChannel: EagleReleaseChannel?
     @State private var flashLevel: Double = 0
     @State private var showingSettings = false
+    @State private var showingLaboratory = false
 
     var body: some View {
         NavigationStack {
@@ -207,6 +208,10 @@ struct LaraHomeView: View {
                 SettingsView()
                     .environmentObject(mgr)
             }
+            .sheet(isPresented: $showingLaboratory) {
+                LaboratoryToolsView()
+                    .environmentObject(mgr)
+            }
             .alert(
                 LaraL10n.text(en: "You'll lose features", es: "Perderás funciones"),
                 isPresented: Binding(
@@ -233,6 +238,7 @@ struct LaraHomeView: View {
                 Text(downgradeMessage(for: target))
             }
         }
+        .background(Color(uiColor: .systemGroupedBackground).ignoresSafeArea())
     }
 
     private var header: some View {
@@ -242,12 +248,12 @@ struct LaraHomeView: View {
     }
 
     private var laboratoryTools: some View {
-        Button { showingSettings = true } label: {
+        Button { showingLaboratory = true } label: {
             LaraToolRow(
                 title: LaraL10n.text(en: "Laboratory tools", es: "Herramientas de Laboratorio"),
                 subtitle: "Kernelcache · RemoteCall",
                 systemImage: "testtube.2",
-                accent: .orange
+                accent: .primary
             )
         }
         .buttonStyle(.plain)

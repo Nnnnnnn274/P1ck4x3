@@ -105,11 +105,7 @@ struct ShowHiddenIconsView: View {
         .onAppear {
             loadState()
         }
-        .alert("Show Hidden Icons", isPresented: .constant(status != nil)) {
-            Button("OK") { status = nil }
-        } message: {
-            Text(status ?? "")
-        }
+        .eagleStatus($status, title: "Show Hidden Icons")
         .alert("Rebuild Application State DB?", isPresented: $confirmRebuildDB) {
             Button("Cancel", role: .cancel) {}
             Button("Rebuild", role: .destructive) {

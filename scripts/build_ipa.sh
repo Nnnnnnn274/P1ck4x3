@@ -15,7 +15,9 @@ cleanup() {
 trap cleanup EXIT
 
 mkdir -p "$BUILD_DIR"
-rm -rf "$DERIVED_DATA"
+if [ "${EAGLE_REUSE_DERIVED_DATA:-0}" != "1" ]; then
+  rm -rf "$DERIVED_DATA"
+fi
 rm -f "$BUILD_DIR/xcodebuild.log" "$BUILD_DIR/$PRODUCT_NAME.ipa"
 
 if [ ! -x "$VERIFY_MATRIX_SCRIPT" ]; then

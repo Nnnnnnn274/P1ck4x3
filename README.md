@@ -16,13 +16,13 @@
 
   <br>
 
-  <a href="https://github.com/leonardob8777-bit/Eagle/releases/download/v1.0.4/Eagle-1.0.4-80.ipa">
-    <img src="https://img.shields.io/badge/DOWNLOAD_EAGLE.IPA-VERSION_1.0.4-7C3AED?style=for-the-badge&logo=apple&logoColor=white" alt="Download Eagle 1.0.4 IPA" height="48">
+  <a href="https://github.com/leonardob8777-bit/Eagle/releases/download/v1.0.5/Eagle-1.0.5-92.ipa">
+    <img src="https://img.shields.io/badge/DOWNLOAD_EAGLE.IPA-VERSION_1.0.5-171717?style=for-the-badge&logo=apple&logoColor=white" alt="Download Eagle 1.0.5 IPA" height="48">
   </a>
 
   <br><br>
 
-  [Release notes](https://github.com/leonardob8777-bit/Eagle/releases/tag/v1.0.4)
+  [Release notes](https://github.com/leonardob8777-bit/Eagle/releases/tag/v1.0.5)
   · [Report a bug](https://github.com/leonardob8777-bit/Eagle/issues/new?template=bug_report.md)
   · [Request a feature](https://github.com/leonardob8777-bit/Eagle/issues/new?template=feature_request.md)
 
@@ -35,7 +35,7 @@
 
 | | |
 |---|---|
-| **Current release** | Eagle 1.0.4 · build 80 |
+| **Current release** | Eagle 1.0.5 · build 92 |
 | **Primarily verified on** | iPhone 16 Pro (`iPhone17,1`) · iOS 18.6.2 (`22G100`) |
 | **Architecture** | `arm64e` |
 | **Verified Aura surfaces** | Dynamic Island, Dock and current-page icon glow/outline · isolated apply and verification |
@@ -57,22 +57,20 @@
 | 🧩 **Icon Studio · Coming soon** | Temporarily unavailable while theme importing and custom shapes are validated. |
 | 📱 **Dock** | Provides layouts supporting up to six apps where SpringBoard accepts them. |
 | ✨ **Aura Studio** | Applies independently colored Dynamic Island and Dock lighting, manages the system Island and Dock background, and keeps verified surface state isolated. |
-| 🖼️ **Island Gallery** | Applies six calibrated photo styles at one verified size and position, each with a fixed color-matched halo. |
-| 🌈 **Dock Gallery** | Places exact-size artwork behind Dock apps without stretching it and preserves independent apply/restore state. |
+| 🖼️ **Island Gallery** | Offers curated Live and Static artwork, Saves, adjustable shadow and precise placement. |
+| 🌈 **Dock Gallery** | Places static and Live artwork behind Dock apps, with Saves, adjustable glow and precise placement. |
 | 🔤 **App Name Color · Advanced** | Applies a page-owned solid color to app names on the current Home Screen page. |
 | 🛡️ **Eagle System** | Adds Guardian checks, Scenes and shareable personalization recipes. |
 
-### New in Eagle 1.0.4
+### New in Eagle 1.0.5
 
-- Added Island Gallery with Starlight, Inferno, Horizon, Vortex, Bubblegum and Traffic artwork, all using one verified geometry and color-matched fixed halos.
-- Added Dock Gallery with Bubblegum, Springfield and Bikini Bottom themes rendered at the exact 382 × 106-point Dock frame.
-- Added an independent, verified Dock-background control while preserving Dock icons and their hit targets.
-- Gallery cards now use color-aware presentation light and gentle motion that respects Reduce Motion.
-- Aura Studio and Dock Gallery now synchronize their verified active state instead of leaving stale selection badges.
-- Improved TrollStore preparation by recognizing an existing mobile-filesystem access path before attempting a sandbox transition.
-- Refined Home navigation, Passcode localization, wallpaper copy, diagnostics and adaptive light/dark presentation throughout the app.
-- Added Live/Static/Saves presentation, Island shadow control, Dock glow control, and the combined Hide Dock + Island screen.
-- Added session ownership checks, invalid preference guards, safer cancellation/recovery, and monochrome New badges.
+- Refreshed Island and Dock Galleries with clearer Live/Static/Saves navigation, focused preview animations, safer media lifetimes and precise quarter-point position controls.
+- Added position controls to Aura Studio without changing its existing apply engine.
+- Added native translucent Access/Customize navigation and Eagle result notifications that do not shift the app content.
+- Prepare keeps its animated rainbow progress, uses a readable green action and transitions smoothly to Ready.
+- Separated general Settings from Laboratory Tools and updated the first-launch Updates window.
+- Corrected white-on-white action text in Cards and related controls; removed three unsuitable Dock-derived styles from Island Gallery while leaving them in Dock.
+- Retained ownership checks and recovery paths for theme, Aura and Hide Dock operations. Apply and Prepare still require compatible devices and should be tested one change at a time.
 
 ### Aura Studio safety model
 

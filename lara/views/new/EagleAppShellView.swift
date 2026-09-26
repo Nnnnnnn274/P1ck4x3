@@ -10,33 +10,29 @@ struct EagleAppShellView: View {
     @ObservedObject private var sceneManager = EagleSceneManager.shared
     @State private var selectedSection = EagleAppSection.customize
 
+    private let shellBackground = Color(uiColor: .systemGroupedBackground)
+
     var body: some View {
-        VStack(spacing: 0) {
-            ZStack {
+        TabView(selection: $selectedSection) {
             EagleBeta10AccessView()
                 .environment(\.laraMediaPreviewsEnabled, selectedSection == .access)
-                .opacity(selectedSection == .access ? 1 : 0)
-                .allowsHitTesting(selectedSection == .access)
-                .accessibilityHidden(selectedSection != .access)
+                .tabItem {
+                    Label(LaraL10n.text(en: "Access", es: "Acceso"), systemImage: "lock.shield.fill")
+                }
+                .tag(EagleAppSection.access)
 
             LaraHomeView()
                 .environment(\.laraMediaPreviewsEnabled, selectedSection == .customize)
-                .opacity(selectedSection == .customize ? 1 : 0)
-                .allowsHitTesting(selectedSection == .customize)
-                .accessibilityHidden(selectedSection != .customize)
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .clipped()
-
-            bottomBar
+                .tabItem {
+                    Label(LaraL10n.text(en: "Customize", es: "Personalizar"), systemImage: "sparkles")
+                }
+                .tag(EagleAppSection.customize)
         }
-        .alert(item: $sceneManager.notice) { notice in
-            Alert(
-                title: Text("Eagle Scenes"),
-                message: Text(notice.message),
-                dismissButton: .default(Text("OK"))
-            )
-        }
+        .tint(.primary)
+        .toolbarBackground(.ultraThinMaterial, for: .tabBar)
+        .toolbarBackground(.visible, for: .tabBar)
+        .background(shellBackground.ignoresSafeArea())
+        .eagleNotice(item: $sceneManager.notice, title: "Eagle Scenes") { $0.message }
         .overlay {
             if sceneManager.isApplying {
                 EagleBlockingProgress(
@@ -50,63 +46,6 @@ struct EagleAppShellView: View {
         }
     }
 
-    private var bottomBar: some View {
-        HStack(spacing: 0) {
-            bottomBarButton(
-                section: .access,
-                title: LaraL10n.text(en: "Access", es: "Acceso"),
-                systemImage: "lock.shield.fill"
-            )
-            bottomBarButton(
-                section: .customize,
-                title: LaraL10n.text(en: "Customize", es: "Personalizar"),
-                systemImage: "sparkles"
-            )
-        }
-        // This is a layout sibling of the navigation stacks, not an inset
-        // over them. Child action bars cannot end up behind the shell tabs.
-        .frame(maxWidth: .infinity)
-        .frame(height: 68, alignment: .center)
-        .clipped()
-        .background(Color(uiColor: .secondarySystemBackground))
-        .overlay(alignment: .top) {
-            Divider().opacity(0.35)
-        }
-    }
-
-    private func bottomBarButton(
-        section: EagleAppSection,
-        title: String,
-        systemImage: String
-    ) -> some View {
-        let selected = selectedSection == section
-        return Button {
-            selectedSection = section
-        } label: {
-            VStack(spacing: 4) {
-                Group {
-                    if selected {
-                        Image(systemName: systemImage)
-                            .foregroundStyle(EagleVisualTheme.accent)
-                    } else {
-                        Image(systemName: systemImage)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-                .font(.system(size: 25, weight: .semibold))
-                .frame(width: 30, height: 30)
-
-                Text(title)
-                    .font(.caption)
-                    .foregroundStyle(selected ? Color.primary : Color.secondary)
-            }
-            .frame(maxWidth: .infinity)
-            .frame(height: 68, alignment: .center)
-            .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-        .accessibilityAddTraits(selected ? .isSelected : [])
-    }
 }
 
 private struct TelegramSafariView: UIViewControllerRepresentable {
@@ -220,6 +159,7 @@ private struct EagleBeta10AccessView: View {
                     .environmentObject(mgr)
             }
         }
+        .background(Color(uiColor: .systemGroupedBackground).ignoresSafeArea())
     }
 
     private var accessHeader: some View {

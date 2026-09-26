@@ -41,6 +41,19 @@ struct EagleBrandMark: View {
     var size: CGFloat
     var body: some View { Image("EagleBrandMark").resizable().scaledToFit().frame(width: size, height: size) }
 }
+struct EagleWordmark: View {
+    var logoSize: CGFloat = 54
+    var nameSize: CGFloat = 32
+    var spacing: CGFloat = 12
+    var body: some View {
+        HStack(spacing: spacing) {
+            EagleBrandMark(size: logoSize)
+            Text("Eagle")
+                .font(.system(size: nameSize, weight: .semibold, design: .serif).lowercaseSmallCaps())
+                .tracking(1.5)
+        }
+    }
+}
 extension EagleBeta10WelcomeView {
     var qaFixes: some View { fixesCard }
     var qaNews: some View { updatesCard }
@@ -103,7 +116,7 @@ swift.write_text(language + theme + badge + components + welcome + stub)
 (app / 'Info.plist').write_bytes(plistlib.dumps({
     'CFBundleIdentifier': 'local.eagle.release-preview', 'CFBundleExecutable': 'EagleReleasePreview',
     'CFBundleName': 'Eagle Release Preview', 'CFBundlePackageType': 'APPL',
-    'CFBundleVersion': '80', 'CFBundleShortVersionString': '1.0.4',
+    'CFBundleVersion': '85', 'CFBundleShortVersionString': '1.0.5',
     'MinimumOSVersion': '16.0', 'UIDeviceFamily': [1], 'UILaunchScreen': {},
     'UIApplicationSceneManifest': {'UIApplicationSupportsMultipleScenes': False},
 }))

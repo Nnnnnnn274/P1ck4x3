@@ -406,6 +406,10 @@ struct AuraStudioView: View {
     @AppStorage("eagle.dockAura.green") private var dockGreen = 0.25
     @AppStorage("eagle.dockAura.blue") private var dockBlue = 1.0
     @AppStorage("eagle.auraStudio.dock.mode") private var dockModeRaw = AuraStudioMode.glow.rawValue
+    @AppStorage("eagle.islandGallery.positionX") private var islandPositionX = 0.0
+    @AppStorage("eagle.islandGallery.positionY") private var islandPositionY = 0.0
+    @AppStorage("eagle.dockGallery.positionX") private var dockPositionX = 0.0
+    @AppStorage("eagle.dockGallery.positionY") private var dockPositionY = 0.0
     @AppStorage("eagle.auraStudio.editingTarget") private var selectedTargetRaw = AuraStudioTarget.island.rawValue
     @AppStorage("eagle.auraStudio.editingIcons") private var editingIcons = false
     @AppStorage("eagle.auraStudio.mode") private var legacySelectedModeRaw = AuraStudioMode.glow.rawValue
@@ -777,6 +781,11 @@ struct AuraStudioView: View {
                     HomeIconNeonView(embedded: true)
                 } else {
                     previewCard
+                    GalleryPositionControl(
+                        x: selectedTarget == .island ? $islandPositionX : $dockPositionX,
+                        y: selectedTarget == .island ? $islandPositionY : $dockPositionY,
+                        disabled: isApplying
+                    )
                     appearanceCard
                 }
 
@@ -795,7 +804,12 @@ struct AuraStudioView: View {
         .navigationTitle("Aura Studio")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(isApplying)
-        .alert(item: $notice) { notice in
+        .onChange(of: notice?.id) { _ in
+            guard let value = notice, !value.offersRespring else { return }
+            EagleNotifications.shared.show(title: "Aura Studio", message: value.message)
+            notice = nil
+        }
+        .alert(item: Binding(get: { notice?.offersRespring == true ? notice : nil }, set: { notice = $0 })) { notice in
             if notice.offersRespring {
                 return Alert(
                     title: Text("Aura Studio"),
@@ -942,6 +956,8 @@ struct AuraStudioView: View {
                                 .interpolation(.high)
                                 .scaledToFit()
                                 .frame(width: 220, height: 92)
+                                .offset(x: GalleryPosition.component(islandPositionX),
+                                        y: GalleryPosition.component(islandPositionY))
                         } else {
                             ZStack {
                                 Capsule()
@@ -972,6 +988,8 @@ struct AuraStudioView: View {
                                 radius: 14
                             )
                             .opacity(level)
+                            .offset(x: GalleryPosition.component(islandPositionX),
+                                    y: GalleryPosition.component(islandPositionY))
                         }
                     } else {
                         let dockMode = mode(for: .dock)
@@ -1001,6 +1019,8 @@ struct AuraStudioView: View {
                         .shadow(color: previewLightColor.opacity(0.85), radius: 13)
                         .hueRotation(.degrees(hue * 360))
                         .opacity(level)
+                        .offset(x: GalleryPosition.component(dockPositionX),
+                                y: GalleryPosition.component(dockPositionY))
                     }
                 }
             }
@@ -1308,7 +1328,7 @@ struct AuraStudioView: View {
     private var applyButtonForeground: Color {
         isApplyButtonDisabled
             ? (colorScheme == .dark ? Color.white.opacity(0.86) : Color.black.opacity(0.78))
-            : .white
+            : EagleVisualTheme.actionText
     }
 
     private var applyButtonBackground: Color {
@@ -1318,7 +1338,7 @@ struct AuraStudioView: View {
         if isApplyButtonDisabled {
             return Color.primary.opacity(colorScheme == .dark ? 0.14 : 0.09)
         }
-        return EagleVisualTheme.accent
+        return EagleVisualTheme.actionFill
     }
 
     private var applyButton: some View {
@@ -1865,6 +1885,10 @@ struct AuraStudioView: View {
             operationTarget == .island
                 ? (sanitizedChannel(islandRed), sanitizedChannel(islandGreen), sanitizedChannel(islandBlue))
                 : (sanitizedChannel(dockRed), sanitizedChannel(dockGreen), sanitizedChannel(dockBlue))
+        let requestedPosition = operation.isRemoving
+            ? GalleryPosition(x: 0, y: 0)
+            : GalleryPosition.saved(operationTarget == .island ? "island" : "dock")
+        let positionSurface: Int32 = operationTarget == .island ? 1 : 0
         let redValue = Int32(channel255(selectedRGB.red))
         let greenValue = Int32(channel255(selectedRGB.green))
         let blueValue = Int32(channel255(selectedRGB.blue))
@@ -2057,7 +2081,10 @@ struct AuraStudioView: View {
             } else {
                 resultMessage = baseResultMessage
             }
-            notice = AuraStudioNotice(message: resultMessage)
+            let kind: EagleNoticeKind = deadlineWarning || motionDegraded || verifiedFallbackResult != nil
+                ? .information
+                : (!operation.isRemoving && newlyApplied == 0 && firstUnavailableResult != nil ? .error : .success)
+            EagleNotifications.shared.show(title: "Aura Studio", message: resultMessage, kind: kind)
         }
 
         func runStep(_ index: Int) {
@@ -2201,7 +2228,13 @@ struct AuraStudioView: View {
 
                 DispatchQueue.global(qos: .userInitiated).async {
                     let result = autoreleasepool {
-                        eagle_set_aura_studio(
+                        eagle_configure_gallery_position(
+                            positionSurface,
+                            requestedPosition.x,
+                            requestedPosition.y
+                        )
+                        defer { eagle_configure_gallery_position(positionSurface, 0, 0) }
+                        return eagle_set_aura_studio(
                             process,
                             redValue,
                             greenValue,

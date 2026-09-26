@@ -204,7 +204,12 @@ struct HideDockIslandView: View {
                     }
             }
         }
-        .alert(item: $notice) { notice in
+        .onChange(of: notice?.id) { _ in
+            guard let value = notice, !value.offersRespring else { return }
+            EagleNotifications.shared.show(title: "Hide Dock + Island", message: value.message)
+            notice = nil
+        }
+        .alert(item: Binding(get: { notice?.offersRespring == true ? notice : nil }, set: { notice = $0 })) { notice in
             if notice.offersRespring {
                 return Alert(title: Text("Hide Dock + Island"), message: Text(notice.message),
                     primaryButton: .default(Text(LaraL10n.text(en: "Respring now", es: "Respring ahora"))) {
@@ -346,7 +351,11 @@ struct HideDockIslandView: View {
             if result.succeeded {
                 UINotificationFeedbackGenerator().notificationOccurred(.success)
             }
-            notice = HideSurfacesNotice(message: result.message, offersRespring: result.offersRespring)
+            if result.offersRespring {
+                notice = HideSurfacesNotice(message: result.message, offersRespring: true)
+            } else {
+                EagleNotifications.shared.result(result.succeeded, title: "Hide Dock", message: result.message)
+            }
         }
     }
 

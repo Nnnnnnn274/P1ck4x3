@@ -1692,13 +1692,7 @@ struct EagleGuardianView: View {
                 deleteCandidate = nil
             }
         }
-        .alert(item: $styleManager.lastResult) { result in
-            Alert(
-                title: Text(result.title),
-                message: Text(result.message),
-                dismissButton: .default(Text("OK"))
-            )
-        }
+        .eagleNotice(item: $styleManager.lastResult, title: "Eagle Styles") { $0.message }
         .overlay {
             if styleManager.isWorking {
                 EagleBlockingProgress(
@@ -1990,9 +1984,7 @@ struct EagleScenesView: View {
                 manager.apply(scene)
             }
         }
-        .alert(item: $manager.notice) { notice in
-            Alert(title: Text("Scenes"), message: Text(notice.message), dismissButton: .default(Text("OK")))
-        }
+        .eagleNotice(item: $manager.notice, title: "Scenes") { $0.message }
         .overlay {
             if manager.isApplying {
                 EagleBlockingProgress(
@@ -2131,7 +2123,8 @@ struct EagleScenesView: View {
                     Label(LaraL10n.text(en: "Use Moment", es: "Usar Moment"), systemImage: "sparkles")
                 }
                 .buttonStyle(.borderedProminent)
-                .tint(moment.accent)
+                .tint(EagleVisualTheme.actionFill)
+                .foregroundStyle(EagleVisualTheme.actionText)
 
                 Menu {
                     Button {
@@ -2573,9 +2566,7 @@ struct EagleCapsulesView: View {
             }
             exportDocument = nil
         }
-        .alert(item: $notice) { notice in
-            Alert(title: Text("Capsules"), message: Text(notice.message), dismissButton: .default(Text("OK")))
-        }
+        .eagleNotice(item: $notice, title: "Capsules") { $0.message }
     }
 
     private var capsuleHero: some View {

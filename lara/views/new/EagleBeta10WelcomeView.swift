@@ -4,6 +4,7 @@ struct EagleBeta10WelcomeView: View {
     let onContinue: () -> Void
 
     @AppStorage(LaraLanguage.storageKey) private var language = LaraLanguage.english
+    @Environment(\.colorScheme) private var colorScheme
 
     private var support: EagleSupportAssessment {
         eagleSupportAssessment()
@@ -29,14 +30,22 @@ struct EagleBeta10WelcomeView: View {
                     updatesCard
                     fixesCard
                     compatibilityCard
-                    referenceDeviceCard
-                    safetyNote
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 18)
                 .padding(.bottom, 28)
             }
-            .background(Color(uiColor: .systemGroupedBackground))
+            .background {
+                ZStack {
+                    Color(uiColor: .systemGroupedBackground)
+                    LinearGradient(
+                        colors: [Color.primary.opacity(0.025), .clear, .clear],
+                        startPoint: .topLeading,
+                        endPoint: .center
+                    )
+                }
+                .ignoresSafeArea()
+            }
             .navigationTitle(LaraL10n.text(en: "Updates", es: "Actualizaciones"))
             .navigationBarTitleDisplayMode(.inline)
             .safeAreaInset(edge: .bottom) {
@@ -47,10 +56,14 @@ struct EagleBeta10WelcomeView: View {
                         .frame(minHeight: 52)
                 }
                 .buttonStyle(.borderedProminent)
-                .tint(.indigo)
+                .tint(EagleVisualTheme.actionFill)
+                .foregroundStyle(EagleVisualTheme.actionText)
                 .padding(.horizontal, 20)
                 .padding(.vertical, 12)
-                .background(.ultraThinMaterial)
+                .background(.regularMaterial)
+                .overlay(alignment: .top) {
+                    Divider().opacity(0.32)
+                }
             }
         }
         .interactiveDismissDisabled(true)
@@ -58,42 +71,53 @@ struct EagleBeta10WelcomeView: View {
     }
 
     private var hero: some View {
-        VStack(spacing: 14) {
-            EagleBrandMark(size: 86)
+        ZStack {
+            RoundedRectangle(cornerRadius: 30, style: .continuous)
+                .fill(Color(uiColor: .secondarySystemGroupedBackground))
 
-            VStack(spacing: 5) {
-                Text(LaraL10n.text(en: "Eagle Updates", es: "Actualizaciones de Eagle"))
-                    .font(.system(.largeTitle, design: .rounded, weight: .bold))
-                    .foregroundStyle(EagleVisualTheme.accent)
-                    .multilineTextAlignment(.center)
+            LinearGradient(
+                colors: [Color.primary.opacity(0.055), .clear, .clear],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
 
-                Text("\(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0.4") · \(Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "80")")
-                    .font(.caption.weight(.black))
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 5)
-                    .background(EagleVisualTheme.accent, in: Capsule())
+            VStack(spacing: 16) {
+                EagleWordmark(logoSize: 58, nameSize: 34, spacing: 12)
 
                 Text(LaraL10n.text(
-                    en: "Refreshed galleries. Clearer controls. Stability improvements.",
-                    es: "Galerías renovadas. Controles más claros. Mejoras de estabilidad."
+                    en: "A more polished Eagle.",
+                    es: "Una Eagle más pulida."
                 ))
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .font(.headline)
                     .multilineTextAlignment(.center)
+
+                Text("v\(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0.5")  •  \(Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "92")")
+                    .font(.caption.monospacedDigit().weight(.bold))
+                    .foregroundStyle(EagleVisualTheme.secondaryText(for: colorScheme))
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(.primary.opacity(0.065), in: Capsule())
             }
+            .padding(.horizontal, 18)
+            .padding(.vertical, 28)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 18)
+        .clipShape(RoundedRectangle(cornerRadius: 30, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 30, style: .continuous)
+                .strokeBorder(EagleVisualTheme.surfaceBorder(for: colorScheme), lineWidth: 1)
+        }
+        .shadow(color: EagleVisualTheme.surfaceShadow(for: colorScheme), radius: 18, y: 8)
     }
 
     private var currentDeviceCard: some View {
         welcomeCard {
-            HStack(alignment: .top, spacing: 13) {
+            HStack(spacing: 13) {
                 Image(systemName: supportSymbol)
                     .font(.title2.weight(.semibold))
                     .foregroundStyle(supportColor)
-                    .frame(width: 34)
+                    .frame(width: 42, height: 42)
+                    .background(supportColor.opacity(0.11), in: RoundedRectangle(cornerRadius: 13, style: .continuous))
                     .accessibilityHidden(true)
 
                 VStack(alignment: .leading, spacing: 6) {
@@ -115,10 +139,6 @@ struct EagleBeta10WelcomeView: View {
                     Text("\(deviceName) · iOS \(systemVersion)")
                         .font(.subheadline.weight(.medium))
 
-                    Text(support.message(spanish: language == .spanish))
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
                 }
             }
             .accessibilityElement(children: .combine)
@@ -144,52 +164,52 @@ struct EagleBeta10WelcomeView: View {
             )
 
             welcomeRow(
-                icon: "capsule.fill",
-                color: .purple,
-                title: LaraL10n.text(en: "Island Gallery", es: "Galería Island"),
-                detail: LaraL10n.text(
-                    en: "Live, Static and Saves, with adjustable shadows and a direct Apply button.",
-                    es: "Live, Static y Saves, con sombra ajustable y botón para aplicar."
-                )
-            )
-
-            welcomeRow(
-                icon: "dock.rectangle",
-                color: .pink,
-                title: LaraL10n.text(en: "Dock Gallery", es: "Galería Dock"),
-                detail: LaraL10n.text(
-                    en: "Live and static themes, Saves, and adjustable glow.",
-                    es: "Temas Live y estáticos, Saves y brillo ajustable."
-                )
-            )
-
-            welcomeRow(
-                icon: "eye.slash.fill",
-                color: .indigo,
-                title: LaraL10n.text(en: "Hide Dock + Island", es: "Hide Dock + Island"),
-                detail: LaraL10n.text(
-                    en: "Both controls now have their own screen. Hide Dock needs a respring and must be reapplied after a full restart.",
-                    es: "Ambos controles tienen su propia pantalla. Hide Dock requiere respring y volver a activarlo tras un reinicio completo."
-                )
-            )
-
-            welcomeRow(
-                icon: "circle.lefthalf.filled",
+                icon: "play.rectangle.on.rectangle.fill",
                 color: .primary,
-                title: LaraL10n.text(en: "Cleaner navigation", es: "Navegación más limpia"),
+                title: LaraL10n.text(en: "Living previews", es: "Previews con vida"),
                 detail: LaraL10n.text(
-                    en: "Black-and-white New badges. Aura Studio no longer shows New.",
-                    es: "Etiquetas Nuevo en blanco y negro. Aura Studio ya no muestra Nuevo."
+                    en: "Photos, GIFs and videos now enter smoothly and keep their correct framing.",
+                    es: "Fotos, GIFs y videos aparecen con fluidez y mantienen el encuadre correcto."
                 )
             )
 
             welcomeRow(
-                icon: "flask.fill",
-                color: .blue,
-                title: LaraL10n.text(en: "Laboratory access", es: "Acceso al laboratorio"),
+                icon: "arrow.left.and.right.righttriangle.left.righttriangle.right",
+                color: .primary,
+                title: LaraL10n.text(en: "Gallery motion", es: "Movimiento en Gallery"),
                 detail: LaraL10n.text(
-                    en: "Advanced and Laboratory tools are easier to find from Customize.",
-                    es: "Acceso más directo a las herramientas avanzadas y de laboratorio desde Personalizar."
+                    en: "New swipe, selection and favorite animations in Island and Dock Gallery.",
+                    es: "Nuevas animaciones al deslizar, seleccionar y guardar en Island y Dock Gallery."
+                )
+            )
+
+            welcomeRow(
+                icon: "move.3d",
+                color: .primary,
+                title: LaraL10n.text(en: "Precise placement", es: "Posición precisa"),
+                detail: LaraL10n.text(
+                    en: "Move Island and Dock artwork in quarter-point steps and restore it instantly.",
+                    es: "Mueve el arte de Island y Dock en pasos de un cuarto de punto y restáuralo al instante."
+                )
+            )
+
+            welcomeRow(
+                icon: "bell.and.waves.left.and.right.fill",
+                color: .primary,
+                title: LaraL10n.text(en: "Eagle notifications", es: "Notificaciones de Eagle"),
+                detail: LaraL10n.text(
+                    en: "Results appear after each action without shifting the screen.",
+                    es: "Los resultados aparecen después de cada acción sin mover la pantalla."
+                )
+            )
+
+            welcomeRow(
+                icon: "rectangle.bottomthird.inset.filled",
+                color: .primary,
+                title: LaraL10n.text(en: "Clearer navigation", es: "Navegación más clara"),
+                detail: LaraL10n.text(
+                    en: "A translucent tab bar, monochrome controls and a smoother Ready transition.",
+                    es: "Barra translúcida, controles monocromáticos y transición más suave a Listo."
                 )
             )
         }
@@ -206,80 +226,60 @@ struct EagleBeta10WelcomeView: View {
             welcomeRow(
                 icon: "checkmark.shield.fill",
                 color: .green,
-                title: LaraL10n.text(en: "Applying themes", es: "Aplicar temas"),
+                title: LaraL10n.text(en: "Public engines preserved", es: "Motores públicos conservados"),
                 detail: LaraL10n.text(
-                    en: "Added checks for expired sessions, repeated taps, interrupted operations and invalid saved settings.",
-                    es: "Más comprobaciones ante sesiones vencidas, toques repetidos, interrupciones y ajustes guardados inválidos."
+                    en: "Prepare, theme Apply, Hide Dock and Aura keep their established execution paths.",
+                    es: "Prepare, Aplicar temas, Hide Dock y Aura conservan sus rutas de ejecución establecidas."
                 )
             )
 
             welcomeRow(
-                icon: "arrow.uturn.backward",
-                color: .indigo,
-                title: LaraL10n.text(en: "Hide Dock recovery", es: "Recuperación de Hide Dock"),
+                icon: "photo.on.rectangle.angled",
+                color: .primary,
+                title: LaraL10n.text(en: "Reliable media", es: "Contenido confiable"),
                 detail: LaraL10n.text(
-                    en: "Changes are checked before reporting success, with original backups and recovery if writing fails.",
-                    es: "Los cambios se comprueban antes de indicar éxito, con copia de originales y recuperación si falla la escritura."
+                    en: "Previews no longer reuse the previous image and stop cleanly in the background.",
+                    es: "Los previews ya no reutilizan la imagen anterior y se detienen correctamente en segundo plano."
                 )
             )
 
             welcomeRow(
-                icon: "hand.tap.fill",
-                color: .blue,
-                title: LaraL10n.text(en: "Visible action buttons", es: "Botones accesibles"),
+                icon: "figure.walk.motion",
+                color: .primary,
+                title: LaraL10n.text(en: "Efficient animation", es: "Animación eficiente"),
                 detail: LaraL10n.text(
-                    en: "Prepare and Apply stay above the bottom navigation bar.",
-                    es: "Preparar y Aplicar quedan por encima de la barra inferior."
+                    en: "Only the featured preview moves; grids remain light and Reduce Motion is respected.",
+                    es: "Solo se mueve el preview destacado; las cuadrículas siguen ligeras y se respeta Reducir movimiento."
                 )
             )
 
             welcomeRow(
-                icon: "capsule",
-                color: .purple,
-                title: LaraL10n.text(en: "Island alignment and light", es: "Posición y luz de Island"),
+                icon: "iphone.gen3",
+                color: .primary,
+                title: LaraL10n.text(en: "Model alignment", es: "Alineación por modelo"),
                 detail: LaraL10n.text(
-                    en: "Fine-tuned alignment on iPhone 16 and 15 Pro Max, plus Glow and Pulse corrections.",
-                    es: "Ajuste de posición en iPhone 16 y 15 Pro Max, y correcciones de Glow y Pulse."
+                    en: "Island alignment remains corrected for iPhone 15 Pro Max and iPhone 16.",
+                    es: "La alineación de Island mantiene su corrección para iPhone 15 Pro Max y iPhone 16."
                 )
             )
 
             welcomeRow(
-                icon: "paintpalette.fill",
-                color: .pink,
-                title: LaraL10n.text(en: "Dock colors and preview", es: "Colores y vista previa del Dock"),
+                icon: "slider.horizontal.3",
+                color: .primary,
+                title: LaraL10n.text(en: "Focused tools", es: "Herramientas ordenadas"),
                 detail: LaraL10n.text(
-                    en: "Corrected Pulse colors and added checks for invalid glow intensity and icon counts.",
-                    es: "Colores de Pulse corregidos y comprobaciones de intensidad e iconos fuera de rango."
+                    en: "Settings and Laboratory Tools now have distinct roles; three unsuitable Island styles were removed from that gallery.",
+                    es: "Ajustes y Laboratory Tools tienen funciones distintas; se retiraron tres estilos inadecuados de Island Gallery."
                 )
             )
 
             welcomeRow(
-                icon: "circle.grid.3x3.fill",
-                color: .orange,
-                title: LaraL10n.text(en: "Passcode and Collections", es: "Código y Colecciones"),
+                icon: "creditcard.fill",
+                color: .primary,
+                title: LaraL10n.text(en: "Readable Card controls", es: "Botones legibles en Tarjetas"),
                 detail: LaraL10n.text(
-                    en: "Corrected digit matching, original backups and recovery after an incomplete change.",
-                    es: "Correcciones en los dígitos, las copias originales y la recuperación de cambios incompletos."
-                )
-            )
-
-            welcomeRow(
-                icon: "arrow.clockwise",
-                color: .cyan,
-                title: LaraL10n.text(en: "Prepare and returning to Eagle", es: "Preparar y volver a Eagle"),
-                detail: LaraL10n.text(
-                    en: "Improved cleanup between attempts and handling of unfinished operations when switching apps.",
-                    es: "Mejor limpieza entre intentos y gestión de operaciones pendientes al cambiar de app."
-                )
-            )
-
-            welcomeRow(
-                icon: "iphone.and.arrow.forward",
-                color: .green,
-                title: LaraL10n.text(en: "TrollStore access", es: "Acceso con TrollStore"),
-                detail: LaraL10n.text(
-                    en: "Recognizes existing file access on supported installations.",
-                    es: "Reconoce el acceso a archivos ya disponible en instalaciones compatibles."
+                    en: "Light action buttons now use dark text; matching contrast was corrected in related controls.",
+                    es: "Los botones claros ahora usan texto oscuro; se corrigió el contraste en controles relacionados."
                 )
             )
         }
@@ -313,26 +313,15 @@ struct EagleBeta10WelcomeView: View {
 
             Label {
                 Text(LaraL10n.text(
-                    en: "Blocked for safety: unverified iOS 16 builds, releases outside the supported ranges above, and current MIE devices.",
-                    es: "Bloqueados por seguridad: builds no verificados de iOS 16, versiones fuera de los rangos compatibles indicados y dispositivos actuales con MIE."
+                    en: "Availability still follows Eagle’s verified device and iOS matrix.",
+                    es: "La disponibilidad sigue la matriz verificada de dispositivos e iOS de Eagle."
                 ))
                 .font(.footnote)
+                .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
             } icon: {
-                Image(systemName: "exclamationmark.triangle.fill")
-                    .foregroundStyle(.red)
-            }
-
-            Label {
-                Text(LaraL10n.text(
-                    en: "Prepare access is available again on iPhone 16 (iPhone17,3) running iOS 18.5.",
-                    es: "El acceso de Preparar vuelve a estar disponible en iPhone 16 (iPhone17,3) con iOS 18.5."
-                ))
-                .font(.footnote.weight(.semibold))
-                .fixedSize(horizontal: false, vertical: true)
-            } icon: {
-                Image(systemName: "checkmark.shield.fill")
-                    .foregroundStyle(.green)
+                Image(systemName: "shield.checkered")
+                    .foregroundStyle(EagleVisualTheme.accent)
             }
         }
     }
@@ -385,8 +374,9 @@ struct EagleBeta10WelcomeView: View {
         .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
         .overlay {
             RoundedRectangle(cornerRadius: 22, style: .continuous)
-                .strokeBorder(.primary.opacity(0.06), lineWidth: 1)
+                .strokeBorder(EagleVisualTheme.surfaceBorder(for: colorScheme), lineWidth: 1)
         }
+        .shadow(color: EagleVisualTheme.surfaceShadow(for: colorScheme), radius: 12, y: 5)
     }
 
     private func welcomeSectionTitle(
@@ -411,7 +401,7 @@ struct EagleBeta10WelcomeView: View {
                 .font(.body.weight(.semibold))
                 .foregroundStyle(color)
                 .frame(width: 28, height: 28)
-                .background(color.opacity(0.14), in: RoundedRectangle(cornerRadius: 11, style: .continuous))
+                .background(.primary.opacity(0.065), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
                 .accessibilityHidden(true)
 
             VStack(alignment: .leading, spacing: 3) {

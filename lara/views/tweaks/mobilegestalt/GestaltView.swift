@@ -366,7 +366,7 @@ struct GestaltView: View {
             print(mgCurrentDict.description)
             prepareGestaltData()
         } catch {
-            Alertinator.shared.alert(title: "Failed to load current MobileGestalt!", body: "\(error)")
+            Alertinator.shared.notice(title: "Failed to load current MobileGestalt!", body: "\(error)", succeeded: false)
         }
     }
     
@@ -408,7 +408,7 @@ struct GestaltView: View {
                 mgDeviceName = deviceName
             }
         } catch {
-            Alertinator.shared.alert(title: "Failed to load data from MobileGestalt!", body: "Please restart the app and try again.\n\nError: \(error)")
+            Alertinator.shared.notice(title: "Failed to load data from MobileGestalt!", body: "Please restart the app and try again.\n\nError: \(error)", succeeded: false)
         }
     }
     
@@ -444,7 +444,7 @@ struct GestaltView: View {
                 throw "Overwrite failed: \(result.message)"
             }
         } catch {
-            Alertinator.shared.alert(title: "Failed to overwrite MobileGestalt!", body: "\(error)")
+            Alertinator.shared.notice(title: "Failed to overwrite MobileGestalt!", body: "\(error)", succeeded: false)
         }
     }
     
@@ -461,7 +461,7 @@ struct GestaltView: View {
                 throw "No MobileGestalt file found!"
             }
         } catch {
-            Alertinator.shared.alert(title: "Failed to restore MobileGestalt!", body: "\(error)")
+            Alertinator.shared.notice(title: "Failed to restore MobileGestalt!", body: "\(error)", succeeded: false)
         }
     }
     

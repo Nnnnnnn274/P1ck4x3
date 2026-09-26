@@ -143,14 +143,7 @@ struct PasscodeExploreView: View {
                     : LaraL10n.text(en: "All styles", es: "Todos los estilos"))
             }
         }
-        .alert(
-            LaraL10n.text(en: "Passcode styles", es: "Estilos del código"),
-            isPresented: Binding(get: { alertMessage != nil }, set: { if !$0 { alertMessage = nil } })
-        ) {
-            Button(LaraL10n.text(en: "OK", es: "Aceptar"), role: .cancel) {}
-        } message: {
-            Text(alertMessage ?? "")
-        }
+        .eagleStatus($alertMessage, title: LaraL10n.text(en: "Passcode styles", es: "Estilos del código"))
     }
 
     private var emptyTitle: String {

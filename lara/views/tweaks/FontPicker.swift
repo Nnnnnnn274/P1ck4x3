@@ -159,6 +159,9 @@ struct FontPicker: View {
                                 }
                                 let success = mgr.vfsoverwritefromlocalpath(target: selectedTarget.path, source: font.path)
                                 success ? mgr.logmsg("font changed to \(font.name)") : mgr.logmsg("failed to change font")
+                                EagleNotifications.shared.result(success, title: "Fonts", message: success
+                                    ? LaraL10n.text(en: "Font applied", es: "Fuente aplicada")
+                                    : LaraL10n.text(en: "Could not apply the font", es: "No se pudo aplicar la fuente"))
                             } label: {
                                 Text(font.name)
                                     .font(viewfontfile(path: font.path, size: 17))
@@ -526,6 +529,9 @@ struct repofontrow: View {
                     source: localurl.path
                 )
                 success ? mgr.logmsg("font changed to \(font.name)") : mgr.logmsg("failed to change font")
+                EagleNotifications.shared.result(success, title: "Fonts", message: success
+                    ? LaraL10n.text(en: "Font applied", es: "Fuente aplicada")
+                    : LaraL10n.text(en: "Could not apply the font", es: "No se pudo aplicar la fuente"))
             } else {
                 Task {
                     await repostore.dlfont(font, repo: repo)
@@ -565,6 +571,9 @@ private struct repoemojirow: View {
         		}
                 let success = mgr.vfsoverwritefromlocalpath(target: emojipath, source: localurl.path)
                 success ? mgr.logmsg("emoji changed to \(emoji.name)") : mgr.logmsg("failed to change emojis")
+                EagleNotifications.shared.result(success, title: "Emoji", message: success
+                    ? LaraL10n.text(en: "Emoji applied", es: "Emoji aplicados")
+                    : LaraL10n.text(en: "Could not apply the emoji", es: "No se pudieron aplicar los emoji"))
             } else {
                 Task { await repostore.dlemoji(emoji, repo: repo) }
             }

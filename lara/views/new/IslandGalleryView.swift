@@ -15,6 +15,15 @@ enum IslandGalleryStyle: Int, CaseIterable, Identifiable {
 
     var id: Int { rawValue }
 
+    // Keep the native IDs readable for existing installs, but these three
+    // Dock-derived images are no longer offered in Island Gallery.
+    var isAvailableInGallery: Bool {
+        switch self {
+        case .duckMood, .blueScreen, .walkingFlame: return false
+        default: return true
+        }
+    }
+
     var title: String {
         switch self {
         case .starlight: return LaraL10n.text(en: "Starlight", es: "Luz estelar")
@@ -173,6 +182,9 @@ final class IslandGalleryExecutor {
                            es: "Vuelve a Eagle antes de aplicar un tema.")
         }
         let version = ProcessInfo.processInfo.operatingSystemVersion
+        let position = restoring
+            ? GalleryPosition(x: 0, y: 0)
+            : GalleryPosition.saved("island")
         let compatibility = EagleDynamicIslandCompatibility.current
 
         guard manager.dsready else {
@@ -286,6 +298,12 @@ final class IslandGalleryExecutor {
         let response: IslandGalleryNativeResponse = await withCheckedContinuation { continuation in
             let workItem = DispatchWorkItem {
                 let nativeResult = autoreleasepool {
+                    eagle_configure_gallery_position(
+                        1,
+                        position.x,
+                        position.y
+                    )
+                    defer { eagle_configure_gallery_position(1, 0, 0) }
                     if let liveDirectory {
                         liveDirectory.path.withCString { eagle_configure_island_live_gallery($0) }
                     } else {

@@ -29,7 +29,8 @@ model = (repo / "lara/views/new/IslandLiveMedia.swift").read_text().split("/// A
 types = source.split("struct IslandGalleryView: View")[0]
 helpers = "\n".join(declaration(marker) for marker in [
     "private var artworks:", "private var favorites:", "private var visibleArtworks:",
-    "private var selected:", "private var activeArtwork:", "private func isActive(",
+    "private var selected:", "private var activeArtwork:",
+    "private var hasRetiredIslandStyle:", "private func isActive(",
     "private var selectionIndex:", "private func toggleFavorite(", "private func select(",
     "private func selectFilter(", "private func synchronizeSelection(",
     "private func restoreSelection(", "private func step(",
@@ -65,17 +66,29 @@ tests = r'''
         h.restoreSelection()
         assert(h.selectedID == "island-9")
         h.liveThemes = catalog.themes
-        assert(h.artworks.count == 51 && Set(h.artworks.map(\.id)).count == 51)
+        let liveCount = catalog.themes.filter(\.isAnimated).count
+        let stillCount = catalog.themes.count - liveCount + 6
+        let allCount = catalog.themes.count + 6
+        assert(h.artworks.count == allCount && Set(h.artworks.map(\.id)).count == allCount)
+        assert(Set(h.artworks.map(\.id)).isDisjoint(with: ["island-32", "island-33", "island-34"]))
+        let retired = Harness()
+        retired.selectedRaw = 32
+        retired.selectedID = "island-32"
+        retired.restoreSelection()
+        assert(retired.selectedID == "island-9" && retired.selectedRaw == 9)
+        retired.activeFlagsRaw = 1
+        retired.activeIslandModeRaw = 32
+        assert(retired.hasRetiredIslandStyle && retired.activeArtwork == nil)
         h.selectFilter(.live)
-        assert(h.visibleArtworks.count == 42)
+        assert(h.visibleArtworks.count == liveCount)
         var seen = Set<String>()
-        for _ in 0..<42 { seen.insert(h.selected!.id); h.step(1) }
-        assert(seen.count == 42 && h.selectionIndex == 0)
+        for _ in 0..<liveCount { seen.insert(h.selected!.id); h.step(1) }
+        assert(seen.count == liveCount && h.selectionIndex == 0)
         h.step(-1)
-        assert(h.selectionIndex == 41)
+        assert(h.selectionIndex == liveCount - 1)
         let lastLive = h.selected!
         h.selectFilter(.still)
-        assert(h.visibleArtworks.count == 9)
+        assert(h.visibleArtworks.count == stillCount)
         h.step(3)
         let still = h.selected!
         h.selectFilter(.live)
@@ -134,7 +147,7 @@ tests = r'''
         restored.liveThemes = []
         restored.synchronizeSelection()
         assert(restored.selected != nil) // Built-in art remains usable offline.
-        print("PASS: 51 unique styles; 42 Live; 9 static; carousel wraparound; category memory; saved/removable favorites; empty/search states; unique active Live identity; operation lock; cold-start restoration; offline fallback")
+        print("PASS: \(allCount) unique styles; \(liveCount) Live; \(stillCount) static; carousel wraparound; category memory; saved/removable favorites; empty/search states; unique active identity; operation lock; cold-start restoration; offline fallback")
     }
 }
 try Harness.verify()

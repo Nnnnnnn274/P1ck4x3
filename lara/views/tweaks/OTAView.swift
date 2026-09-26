@@ -104,14 +104,7 @@ struct OTAView: View {
                 refreshConfiguration()
             }
         }
-        .alert(
-            LaraL10n.text(en: "Result", es: "Resultado"),
-            isPresented: .constant(lastResult != nil)
-        ) {
-            Button("OK") { lastResult = nil }
-        } message: {
-            Text(lastResult ?? "")
-        }
+        .eagleStatus($lastResult, title: "OTA")
     }
 
     private var configurationTitle: String {

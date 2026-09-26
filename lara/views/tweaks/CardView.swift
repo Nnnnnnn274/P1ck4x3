@@ -201,15 +201,15 @@ struct CardView: View {
         }
     }
 
-    // Acción principal: relleno estable en el acento (no derivado del color del
-    // usuario) con feedback de escala al presionar.
+    // Use a paired dynamic fill and foreground so the light button always has
+    // dark text, including when the app's accent itself resolves to white.
     private struct CardProminentButtonStyle: ButtonStyle {
         func makeBody(configuration: Configuration) -> some View {
             configuration.label
-                .foregroundStyle(.white)
+                .foregroundStyle(EagleVisualTheme.actionText)
                 .background(
                     RoundedRectangle(cornerRadius: 14, style: .continuous)
-                        .fill(Color.accentColor)
+                        .fill(EagleVisualTheme.actionFill)
                         .opacity(configuration.isPressed ? 0.85 : 1)
                 )
                 .scaleEffect(configuration.isPressed ? 0.97 : 1)
@@ -221,7 +221,7 @@ struct CardView: View {
     private struct CardSecondaryButtonStyle: ButtonStyle {
         func makeBody(configuration: Configuration) -> some View {
             configuration.label
-                .foregroundStyle(Color.accentColor)
+                .foregroundStyle(.primary)
                 .background(
                     RoundedRectangle(cornerRadius: 14, style: .continuous)
                         .fill(Color(uiColor: .tertiarySystemFill))

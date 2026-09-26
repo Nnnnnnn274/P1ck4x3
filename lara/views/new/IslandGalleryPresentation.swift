@@ -6,18 +6,25 @@ struct IslandGalleryArtwork: Identifiable {
     let style: IslandGalleryStyle
     var liveTheme: IslandLiveTheme? = nil
     var id: String { liveTheme?.id ?? (style == .singularityLive ? "singularity-live" : "island-\(style.rawValue)") }
-    var isLive: Bool { style == .singularityLive }
+    var isRemote: Bool { style == .singularityLive }
+    var isLive: Bool { isRemote && (liveTheme?.isAnimated ?? true) }
     var title: String { liveTheme.map { LaraL10n.text(en: $0.title, es: $0.titleES) } ?? style.title }
     var subtitle: String {
         if isLive { return LaraL10n.text(en: "Art in motion. Made for your Island.", es: "Arte en movimiento. Hecho para tu isla.") }
+        if isRemote { return LaraL10n.text(en: "Still art for your Island.", es: "Arte fijo para tu isla.") }
         return style.subtitle
     }
     var accent: Color {
         guard let rgb = liveTheme?.rgb else { return style.accent }
         return Color(red: Double(rgb.red) / 255, green: Double(rgb.green) / 255, blue: Double(rgb.blue) / 255)
     }
-    var posterURL: URL? { isLive ? (liveTheme?.posterURL ?? IslandLiveMedia.posterURL) : nil }
-    var motionURL: URL? { isLive ? (liveTheme?.previewURL ?? IslandLiveMedia.previewURL) : nil }
+    var actionTextColor: Color {
+        let rgb = liveTheme?.rgb ?? style.rgb
+        let brightness = (0.2126 * Double(rgb.red) + 0.7152 * Double(rgb.green) + 0.0722 * Double(rgb.blue)) / 255
+        return brightness > 0.65 ? .black : .white
+    }
+    var posterURL: URL? { isRemote ? (liveTheme?.posterURL ?? IslandLiveMedia.posterURL) : nil }
+    var motionURL: URL? { isRemote ? (liveTheme?.previewURL ?? IslandLiveMedia.previewURL) : nil }
 }
 
 enum IslandGalleryFilter: String, CaseIterable, Identifiable {
@@ -55,6 +62,8 @@ struct IslandGalleryView: View {
     @AppStorage("eagle.islandGallery.selectedArtworkID") private var selectedID = ""
     @AppStorage("eagle.islandGallery.favoriteIDs") private var favoritesJSON = "[]"
     @AppStorage("eagle.islandGallery.shadowIntensity") private var shadowIntensity = 0.72
+    @AppStorage("eagle.islandGallery.positionX") private var positionX = 0.0
+    @AppStorage("eagle.islandGallery.positionY") private var positionY = 0.0
     @AppStorage("eagle.auraStudio.activeFlags") private var activeFlagsRaw = 0
     @AppStorage("eagle.auraStudio.activeIslandMode") private var activeIslandModeRaw = 0
     @AppStorage("eagle.islandGallery.activeLiveID") private var activeLiveID = "singularity-live"
@@ -68,11 +77,10 @@ struct IslandGalleryView: View {
     @State private var motionPaused = false
     @State private var applying = false
     @State private var showAccess = false
-    @State private var result: IslandGalleryApplyResult?
     @State private var rememberedSelections: [IslandGalleryFilter: String] = [:]
 
     private var artworks: [IslandGalleryArtwork] {
-        IslandGalleryStyle.allCases.map { style in
+        IslandGalleryStyle.allCases.filter(\.isAvailableInGallery).map { style in
             IslandGalleryArtwork(style: style, liveTheme: style == .singularityLive
                 ? liveThemes.first(where: { $0.id == "singularity-live" }) : nil)
         } + liveThemes.filter { $0.id != "singularity-live" }.map { IslandGalleryArtwork(style: .singularityLive, liveTheme: $0) }
@@ -96,9 +104,13 @@ struct IslandGalleryView: View {
     private var activeArtwork: IslandGalleryArtwork? {
         artworks.first(where: isActive)
     }
+    private var hasRetiredIslandStyle: Bool {
+        (activeFlagsRaw & 1) != 0 &&
+            IslandGalleryStyle(rawValue: activeIslandModeRaw)?.isAvailableInGallery == false
+    }
     private func isActive(_ item: IslandGalleryArtwork) -> Bool {
         (activeFlagsRaw & 1) != 0 && activeIslandModeRaw == item.style.rawValue &&
-            (!item.isLive || activeLiveID == item.id)
+            (!item.isRemote || activeLiveID == item.id)
     }
     private var selectionIndex: Int {
         visibleArtworks.firstIndex(where: { $0.id == selected?.id }) ?? 0
@@ -108,7 +120,7 @@ struct IslandGalleryView: View {
         ScrollViewReader { proxy in
             VStack(spacing: 0) {
             ScrollView {
-                LazyVStack(alignment: .leading, spacing: 24) {
+                VStack(alignment: .leading, spacing: 24) {
                     filterPicker
                     if let item = selected {
                         featuredPresentation(item)
@@ -119,13 +131,15 @@ struct IslandGalleryView: View {
                     if loading {
                         HStack(spacing: 8) {
                             ProgressView().controlSize(.small)
-                            Text(LaraL10n.text(en: "Loading the Live collection…", es: "Cargando la colección Live…"))
+                            Text(LaraL10n.text(en: "Loading collection…", es: "Cargando colección…"))
                                 .font(.caption).foregroundStyle(.secondary)
                         }
                         .frame(maxWidth: .infinity)
                     }
                     if let active = activeArtwork {
                         activeStyleSummary(active)
+                    } else if hasRetiredIslandStyle {
+                        retiredStyleRestoration
                     }
                 }
                 .padding(.horizontal, 20)
@@ -151,14 +165,6 @@ struct IslandGalleryView: View {
                 }
             }
             .sheet(isPresented: $showAccess) { accessSheet }
-            .alert(
-                result?.succeeded == true
-                    ? LaraL10n.text(en: "Island updated", es: "Island actualizada")
-                    : LaraL10n.text(en: "Could not apply", es: "No se pudo aplicar"),
-                isPresented: Binding(get: { result != nil }, set: { if !$0 { result = nil } })
-            ) {
-                Button(LaraL10n.text(en: "Done", es: "Listo"), role: .cancel) { result = nil }
-            } message: { Text(result?.message ?? "") }
             .task { await loadCatalog() }
             .onAppear { restoreSelection() }
             .onChange(of: search) { _ in synchronizeSelection() }
@@ -167,34 +173,17 @@ struct IslandGalleryView: View {
     }
 
     private var filterPicker: some View {
-        ViewThatFits(in: .horizontal) {
-            filterButtons
-            ScrollView(.horizontal, showsIndicators: false) { filterButtons }
+        GalleryFilterBar(
+            items: [IslandGalleryFilter.all, .still, .live, .favorites].map {
+                GalleryFilterItem(id: $0.rawValue, title: $0.title, icon: $0.icon)
+            },
+            selectedID: filter.rawValue,
+            disabled: applying,
+            accessibilityPrefix: "island"
+        ) { id in
+            guard let option = IslandGalleryFilter(rawValue: id) else { return }
+            selectFilter(option)
         }
-    }
-
-    private var filterButtons: some View {
-        HStack(spacing: 6) {
-            ForEach(IslandGalleryFilter.allCases) { option in
-                Button { selectFilter(option) } label: {
-                    HStack(spacing: 5) {
-                        Image(systemName: option.icon).font(.system(size: 11, weight: .semibold))
-                        Text(option.title).font(.system(size: 12, weight: .semibold))
-                    }
-                    .fixedSize()
-                    .padding(.horizontal, 12)
-                    .frame(maxWidth: .infinity, minHeight: 44)
-                    .foregroundStyle(filter == option ? Color(uiColor: .systemBackground) : .primary)
-                    .background(filter == option ? Color.primary : .clear, in: RoundedRectangle(cornerRadius: 13))
-                }
-                .buttonStyle(.plain)
-                .disabled(applying)
-                .accessibilityAddTraits(filter == option ? .isSelected : [])
-                .accessibilityIdentifier("island-filter-\(option.rawValue)")
-            }
-        }
-        .padding(4)
-        .background(Color.primary.opacity(0.04), in: RoundedRectangle(cornerRadius: 17))
     }
 
     private func featuredPresentation(_ item: IslandGalleryArtwork) -> some View {
@@ -203,22 +192,19 @@ struct IslandGalleryView: View {
                 artwork: item,
                 playing: !applying && !motionPaused && !reduceMotion,
                 active: isActive(item),
-                shadowIntensity: shadowIntensity
+                shadowIntensity: shadowIntensity,
+                position: GalleryPosition(x: positionX, y: positionY)
             )
-                .id(item.id)
-                .contentShape(RoundedRectangle(cornerRadius: 30))
+                .contentShape(Rectangle())
                 .simultaneousGesture(DragGesture(minimumDistance: 30).onEnded { gesture in
                     guard abs(gesture.translation.width) > abs(gesture.translation.height) else { return }
-                    step(gesture.translation.width < 0 ? 1 : -1)
+                    animatedStep(gesture.translation.width < 0 ? 1 : -1)
                 })
-            shadowControl
-            HStack(spacing: 12) {
-                navigationButton("chevron.left", direction: -1)
-                VStack(spacing: 3) {
-                    Text(String(format: "%02d", selectionIndex + 1) + " / " + String(format: "%02d", visibleArtworks.count))
-                        .font(.system(.subheadline, design: .monospaced).weight(.semibold))
-                }
-                .frame(maxWidth: .infinity)
+            HStack(spacing: 8) {
+                Text(item.title)
+                    .font(.title3.bold())
+                    .lineLimit(2)
+                Spacer(minLength: 6)
                 if item.isLive {
                     Button { motionPaused.toggle() } label: {
                         Image(systemName: motionPaused || reduceMotion ? "play.fill" : "pause.fill")
@@ -233,8 +219,22 @@ struct IslandGalleryView: View {
                         : LaraL10n.text(en: "Pause preview", es: "Pausar vista previa"))
                 }
                 favoriteButton(item)
+            }
+            HStack(spacing: 28) {
+                navigationButton("chevron.left", direction: -1)
+                Text(String(format: "%02d", selectionIndex + 1) + " / " + String(format: "%02d", visibleArtworks.count))
+                    .font(.caption.monospacedDigit().weight(.semibold))
+                    .foregroundStyle(.secondary)
+                    .frame(minWidth: 54)
                 navigationButton("chevron.right", direction: 1)
             }
+            .frame(maxWidth: .infinity)
+            shadowControl
+            GalleryPositionControl(
+                x: $positionX,
+                y: $positionY,
+                disabled: applying
+            )
         }
     }
 
@@ -265,7 +265,7 @@ struct IslandGalleryView: View {
     }
 
     private func navigationButton(_ symbol: String, direction: Int) -> some View {
-        Button { step(direction) } label: {
+        Button { animatedStep(direction) } label: {
             Image(systemName: symbol).font(.system(size: 13, weight: .bold))
                 .frame(width: 44, height: 44)
                 .background(Color.primary.opacity(0.06), in: Circle())
@@ -295,7 +295,7 @@ struct IslandGalleryView: View {
                       spacing: 12) {
                 ForEach(visibleArtworks) { item in
                     collectionTile(item) {
-                        select(item)
+                        selectForPreview(item)
                         withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.3)) {
                             proxy.scrollTo("island-featured", anchor: .top)
                         }
@@ -448,6 +448,30 @@ struct IslandGalleryView: View {
         .background(Color.primary.opacity(0.035), in: RoundedRectangle(cornerRadius: 20))
     }
 
+    private var retiredStyleRestoration: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "checkmark.seal.fill")
+                .foregroundStyle(.secondary)
+            Text(LaraL10n.text(
+                en: "A previous Island style is active",
+                es: "Hay un estilo anterior activo en Island"
+            ))
+            .font(.subheadline.weight(.semibold))
+            Spacer()
+            Button(role: .destructive) { restore() } label: {
+                Image(systemName: "arrow.counterclockwise")
+                    .frame(width: 44, height: 44)
+            }
+            .disabled(applying)
+            .accessibilityLabel(LaraL10n.text(
+                en: "Restore original Island",
+                es: "Restaurar Island original"
+            ))
+        }
+        .padding(14)
+        .background(Color.primary.opacity(0.035), in: RoundedRectangle(cornerRadius: 20))
+    }
+
     @ViewBuilder private var actionBar: some View {
         if let item = selected {
             HStack(spacing: 10) {
@@ -456,7 +480,7 @@ struct IslandGalleryView: View {
                     else { apply(item) }
                 } label: {
                     HStack(spacing: 8) {
-                        if applying { ProgressView().tint(.white) }
+                        if applying { ProgressView().tint(EagleVisualTheme.actionText) }
                         else {
                             Image(systemName: !manager.dsready
                                 ? "lock.shield.fill"
@@ -473,9 +497,10 @@ struct IslandGalleryView: View {
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 10)
+                    .foregroundStyle(EagleVisualTheme.actionText)
                 }
                 .buttonStyle(.borderedProminent)
-                .tint(!manager.dsready ? .blue : item.accent)
+                .tint(EagleVisualTheme.actionFill)
                 .accessibilityIdentifier("island-apply")
 
                 if isActive(item) && manager.dsready {
@@ -552,6 +577,10 @@ struct IslandGalleryView: View {
         UISelectionFeedbackGenerator().selectionChanged()
     }
 
+    private func selectForPreview(_ item: IslandGalleryArtwork) {
+        select(item)
+    }
+
     private func selectFilter(_ value: IslandGalleryFilter) {
         guard !applying else { return }
         if let selected { rememberedSelections[filter] = selected.id }
@@ -572,6 +601,13 @@ struct IslandGalleryView: View {
     }
 
     private func restoreSelection() {
+        if let oldStyle = IslandGalleryStyle(rawValue: selectedRaw),
+           !oldStyle.isAvailableInGallery {
+            selectedRaw = IslandGalleryStyle.starlight.rawValue
+            if selectedID == IslandGalleryArtwork(style: oldStyle).id {
+                selectedID = ""
+            }
+        }
         guard selectedID.isEmpty else { return }
         if (activeFlagsRaw & 1) != 0 && activeIslandModeRaw == IslandGalleryStyle.singularityLive.rawValue {
             // Remote identity must survive before the catalog has arrived.
@@ -587,6 +623,10 @@ struct IslandGalleryView: View {
         guard !applying, visibleArtworks.count > 1 else { return }
         let next = (selectionIndex + delta + visibleArtworks.count) % visibleArtworks.count
         select(visibleArtworks[next])
+    }
+
+    private func animatedStep(_ delta: Int) {
+        step(delta)
     }
 
     private func loadCatalog(force: Bool = false) async {
@@ -624,7 +664,7 @@ struct IslandGalleryView: View {
             }
             applying = false
             UINotificationFeedbackGenerator().notificationOccurred(response.succeeded ? .success : .error)
-            result = response
+            EagleNotifications.shared.result(response.succeeded, title: "Island Gallery", message: response.message)
         }
     }
 
@@ -635,7 +675,7 @@ struct IslandGalleryView: View {
             let response = await IslandGalleryExecutor.shared.restore()
             applying = false
             UINotificationFeedbackGenerator().notificationOccurred(response.succeeded ? .success : .error)
-            result = response
+            EagleNotifications.shared.result(response.succeeded, title: "Island Gallery", message: response.message)
         }
     }
 }
@@ -645,14 +685,28 @@ private struct IslandGalleryArtworkImage: View {
     let artwork: IslandGalleryArtwork
     let animated: Bool
     var compact = false
+    var presentationMotion = false
     var body: some View {
         Group {
-            if artwork.isLive {
+            if artwork.isRemote {
                 LaraRemoteMediaPreview(url: animated ? artwork.motionURL : artwork.posterURL,
-                                       animated: animated, contentMode: .fit,
-                                       showsRetry: !compact, compactPlaceholder: compact, background: .clear)
+                                       animated: animated, contentMode: compact ? .fill : .fit,
+                                       showsRetry: !compact, compactPlaceholder: compact, background: .clear,
+                                       presentationMotion: presentationMotion && !animated)
             } else {
-                Image(artwork.style.assetName).resizable().interpolation(.high).scaledToFit()
+                if compact {
+                    Image(artwork.style.assetName)
+                        .resizable()
+                        .interpolation(.high)
+                        .scaledToFill()
+                        .eagleGalleryPresentationMotion(active: presentationMotion)
+                } else {
+                    Image(artwork.style.assetName)
+                        .resizable()
+                        .interpolation(.high)
+                        .scaledToFit()
+                        .eagleGalleryPresentationMotion(active: presentationMotion)
+                }
             }
         }
         .accessibilityHidden(compact)
@@ -664,112 +718,57 @@ private struct IslandGalleryStage: View {
     let playing: Bool
     let active: Bool
     let shadowIntensity: Double
+    let position: GalleryPosition
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
-        VStack(spacing: 0) {
-            HStack(spacing: 6) {
-                Circle().fill(artwork.accent).frame(width: 5, height: 5)
-                Text(artwork.isLive ? "LIVE" : "STATIC")
-                    .font(.system(size: 9, weight: .semibold, design: .monospaced)).tracking(1.5)
-                Spacer()
-                if active {
-                    Label(LaraL10n.text(en: "Applied", es: "Aplicado"), systemImage: "checkmark.circle.fill")
-                        .font(.system(size: 10, weight: .medium)).foregroundStyle(.mint)
-                } else {
-                    Image(systemName: "viewfinder").font(.system(size: 15, weight: .light))
-                }
-            }
-            .foregroundStyle(.white.opacity(0.7))
-            .padding(.horizontal, 22)
-            .padding(.top, 21)
+        GeometryReader { proxy in
+            let islandWidth = min(max(proxy.size.width - 145, 126), 210)
+            HStack(spacing: 10) {
+                Text("9:41")
+                    .font(.system(size: 15, weight: .semibold, design: .rounded))
+                    .monospacedDigit()
+                    .fixedSize()
+                    .frame(width: 38, alignment: .leading)
 
-            phoneContext
-                .frame(height: 208)
-
-            HStack(alignment: .bottom, spacing: 12) {
-                VStack(alignment: .leading, spacing: 6) {
-                    Text(artwork.title).font(.system(size: 25, weight: .semibold, design: .rounded))
-                        .tracking(-0.6).foregroundStyle(.white).lineLimit(2)
-                }
-                Spacer(minLength: 0)
-                HStack(spacing: -4) {
-                    Circle().fill(artwork.accent.opacity(0.45))
-                    Circle().fill(artwork.accent)
-                    Circle().fill(.white.opacity(0.85))
-                }
-                .frame(width: 42, height: 16)
-                .accessibilityHidden(true)
-            }
-            .padding(.horizontal, 22)
-            .padding(.bottom, 23)
-        }
-        .background {
-            ZStack {
-                Color(red: 0.035, green: 0.035, blue: 0.047)
-                RadialGradient(colors: [artwork.accent.opacity(0.19), .clear], center: .init(x: 0.5, y: 0.35),
-                               startRadius: 2, endRadius: 230)
-                LinearGradient(colors: [.white.opacity(0.025), .clear, artwork.accent.opacity(0.04)],
-                               startPoint: .topLeading, endPoint: .bottomTrailing)
-            }
-        }
-        .clipShape(RoundedRectangle(cornerRadius: 30, style: .continuous))
-        .overlay {
-            RoundedRectangle(cornerRadius: 30, style: .continuous)
-                .strokeBorder(LinearGradient(colors: [.white.opacity(0.18), artwork.accent.opacity(0.12), .white.opacity(0.055)],
-                                              startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: 1)
-        }
-        .shadow(color: artwork.accent.opacity(0.12), radius: 22, y: 10)
-        .accessibilityElement(children: .contain)
-        .accessibilityIdentifier("island-featured-stage")
-    }
-
-    private var phoneContext: some View {
-        VStack(spacing: 0) {
-            HStack {
-                Text("9:41").font(.system(size: 10, weight: .semibold))
-                Spacer()
-                Image(systemName: "cellularbars")
-                Image(systemName: "wifi")
-                Image(systemName: "battery.100percent")
-            }
-            .font(.system(size: 9)).foregroundStyle(.white.opacity(0.8))
-            .padding(.horizontal, 21)
-            .frame(height: 42)
-            .overlay(alignment: .center) {
-                IslandGalleryArtworkImage(artwork: artwork, animated: playing && artwork.isLive, compact: true)
-                    .frame(width: 130, height: 54)
-                    .shadow(
-                        color: artwork.accent.opacity(0.9 * shadowIntensity),
-                        radius: 12 * shadowIntensity
+                ZStack {
+                    IslandGalleryArtworkImage(
+                        artwork: artwork,
+                        animated: playing && artwork.isLive,
+                        compact: true
                     )
-                    .offset(y: 3)
-            }
-                VStack(spacing: 0) {
-                    Text(LaraL10n.text(en: "Sunday, September 6", es: "Domingo, 6 de septiembre"))
-                        .font(.system(size: 11, weight: .medium)).foregroundStyle(.white.opacity(0.7))
-                    Text("9:41")
-                        .font(.system(size: 62, weight: .thin, design: .rounded)).tracking(-3).foregroundStyle(.white.opacity(0.9))
+                    .id(artwork.id)
+                    .transition(.opacity)
                 }
-                .padding(.top, 14)
-                Spacer(minLength: 0)
-        }
-        .frame(width: 260, height: 193)
-        .background {
-            ZStack {
-                Color(red: 0.06, green: 0.06, blue: 0.10)
-                Ellipse().fill(artwork.accent.opacity(0.45)).frame(width: 230, height: 290)
-                    .blur(radius: 25).rotationEffect(.degrees(-45)).offset(x: 94, y: 90)
-                Ellipse().stroke(.white.opacity(0.09), lineWidth: 36)
-                    .frame(width: 230, height: 330).rotationEffect(.degrees(-45)).offset(x: -55, y: 100)
+                .frame(width: islandWidth, height: 68)
+                // Server previews are 1200×500 with the actual Island inset
+                // inside a transparent canvas. Enlarge only the art, never
+                // the surrounding controls or gallery layout.
+                .scaleEffect(1.40)
+                .frame(width: islandWidth, height: 68)
+                .animation(reduceMotion ? nil : .easeInOut(duration: 0.18), value: artwork.id)
+                .shadow(
+                    color: artwork.accent.opacity(0.9 * shadowIntensity),
+                    radius: 17 * shadowIntensity
+                )
+                .offset(x: position.x, y: position.y)
+
+                HStack(spacing: 5) {
+                    Image(systemName: "cellularbars")
+                    Image(systemName: "wifi")
+                    Image(systemName: "battery.100percent")
+                }
+                .font(.system(size: 12, weight: .semibold))
+                .fixedSize()
+                .frame(maxWidth: .infinity, alignment: .trailing)
             }
+            .foregroundStyle(.primary)
+            .padding(.horizontal, 10)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .clipShape(RoundedRectangle(cornerRadius: 29))
-        .overlay {
-            RoundedRectangle(cornerRadius: 29)
-                .stroke(.white.opacity(0.18), lineWidth: 1)
-        }
-        .mask(LinearGradient(stops: [.init(color: .black, location: 0), .init(color: .black, location: 0.75),
-                                      .init(color: .clear, location: 1)], startPoint: .top, endPoint: .bottom))
-        .padding(.top, 14)
+        .frame(height: 112)
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel(artwork.title)
+        .accessibilityIdentifier("island-featured-stage")
     }
 }

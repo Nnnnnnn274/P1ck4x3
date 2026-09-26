@@ -30,16 +30,29 @@ struct LaraAccessView: View {
         Group {
             if mgr.sbxready {
                 readyView
+                    .transition(.opacity.combined(with: .scale(scale: 0.97)))
             } else {
                 preparationView
+                    .transition(.opacity)
             }
         }
+        .animation(.spring(response: 0.48, dampingFraction: 0.85), value: mgr.sbxready)
         .onChange(of: mgr.dsprogress) { progress in
             if mgr.dsrunning {
                 state = .preparing(LaraL10n.text(
                     en: "Preparing device",
                     es: "Preparando el dispositivo"
                 ), progress)
+            }
+        }
+        .onChange(of: state) { value in
+            switch value {
+            case .ready:
+                EagleNotifications.shared.result(true, title: "Eagle",
+                    message: LaraL10n.text(en: "Access is ready", es: "Acceso preparado"))
+            case .failed(let message):
+                EagleNotifications.shared.result(false, title: "Prepare", message: message)
+            default: break
             }
         }
 #if EAGLE_A18_PREPARE_LAB
@@ -66,43 +79,39 @@ struct LaraAccessView: View {
 
     private var preparationView: some View {
         VStack(alignment: .leading, spacing: compact ? 12 : 16) {
-            HStack(alignment: .top, spacing: 12) {
-                Image(systemName: "lock.shield.fill")
-                    .font(.title3)
-                    .foregroundStyle(.blue)
-                    .frame(width: 28)
+            HStack(spacing: 12) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .fill(Color.green.opacity(0.14))
+                    Image(systemName: "lock.shield.fill")
+                        .font(.system(size: 19, weight: .semibold))
+                        .foregroundStyle(.green)
+                }
+                .frame(width: 42, height: 42)
 
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(LaraL10n.text(en: "Prepare access", es: "Preparar acceso"))
-                        .font(.headline)
-                    Text(LaraL10n.text(
-                        en: "Uses Eagle's access engine only on allowed device and iOS combinations. If the iPhone restarts, do not retry; reopen Eagle and share a Prepare report.",
-                        es: "Usa el motor de acceso de Eagle solo en combinaciones permitidas de dispositivo e iOS. Si el iPhone se reinicia, no lo intentes otra vez; abre Eagle y comparte un reporte de Preparar."
-                    ))
-                        .font(.subheadline)
-                        .foregroundStyle(EagleVisualTheme.secondaryText(for: colorScheme))
-                        .fixedSize(horizontal: false, vertical: true)
+                Text(LaraL10n.text(en: "Prepare", es: "Preparar"))
+                    .font(.title3.weight(.semibold))
+
+                Spacer(minLength: 0)
+
+                if isBusy {
+                    EagleRainbowSpinner(size: 20)
                 }
             }
 
             switch state {
             case .preparing(let message, let progress):
                 VStack(alignment: .leading, spacing: 8) {
-                    HStack {
-                        Text(message)
-                            .font(.subheadline.weight(.medium))
-                        Spacer()
-                        EagleRainbowSpinner()
-                    }
+                    Text(message)
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(EagleVisualTheme.secondaryText(for: colorScheme))
                     if let progress {
                         EagleRainbowProgressBar(value: progress)
                     }
                 }
 
-            case .failed(let message):
-                Label(message, systemImage: "exclamationmark.circle.fill")
-                    .font(.footnote)
-                    .foregroundStyle(.red)
+            case .failed:
+                EmptyView()
 
 #if EAGLE_A18_PREPARE_LAB
             case .kernelStageReady(let message):
@@ -120,6 +129,8 @@ struct LaraAccessView: View {
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
+            .tint(.green)
+            .foregroundStyle(.black)
             .controlSize(.large)
 #if EAGLE_A18_PREPARE_LAB
             .disabled(isBusy || isKernelStageReady || labAttemptLocked || isunsupported() || isdebugged())
@@ -127,43 +138,6 @@ struct LaraAccessView: View {
             .disabled(isBusy || isunsupported() || isdebugged())
 #endif
 
-            if isunsupported() {
-                Text(eagleSupportAssessment().message(
-                    spanish: LaraL10n.language == .spanish
-                ))
-                    .font(.footnote)
-                    .foregroundStyle(EagleVisualTheme.secondaryText(for: colorScheme))
-            } else if isdebugged() {
-                Label {
-                    Text(LaraL10n.text(
-                        en: "Do not prepare access while Xcode is attached. Press Stop in Xcode, then open Eagle manually from the Home Screen.",
-                        es: "No prepares el acceso mientras Xcode esté conectado. Pulsa Stop en Xcode y después abre Eagle manualmente desde la pantalla de inicio."
-                    ))
-                } icon: {
-                    Image(systemName: "cable.connector.slash")
-                }
-                .font(.footnote.weight(.medium))
-                .foregroundStyle(.orange)
-            }
-#if EAGLE_A18_PREPARE_LAB
-            if !isunsupported(), !isdebugged(), isA18KernelStageLabRuntime {
-                Label {
-                    Text(labAttemptLocked
-                        ? LaraL10n.text(
-                            en: "A kernel-stage attempt is already recorded for this iPhone and build. This private lab will not run it again.",
-                            es: "Ya existe un intento de la etapa del kernel para este iPhone y esta compilación. Este laboratorio privado no lo ejecutará otra vez."
-                        )
-                        : LaraL10n.text(
-                            en: "Private one-shot lab: it tests only the kernel stage and does not continue to compatibility data, sandbox access, or Aura.",
-                            es: "Laboratorio privado de un solo intento: prueba solo la etapa del kernel y no continúa con datos de compatibilidad, acceso al sandbox ni Aura."
-                        ))
-                } icon: {
-                    Image(systemName: "exclamationmark.shield.fill")
-                }
-                .font(.footnote.weight(.medium))
-                .foregroundStyle(.orange)
-            }
-#endif
         }
         .padding(compact ? 16 : 20)
         .background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 22, style: .continuous))

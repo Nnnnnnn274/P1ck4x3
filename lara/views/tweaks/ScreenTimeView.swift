@@ -140,14 +140,7 @@ struct ScreenTimeView: View {
                 refreshConfiguration()
             }
         }
-        .alert(
-            LaraL10n.text(en: "Result", es: "Resultado"),
-            isPresented: .constant(lastResult != nil)
-        ) {
-            Button("OK") { lastResult = nil }
-        } message: {
-            Text(lastResult ?? "")
-        }
+        .eagleStatus($lastResult, title: LaraL10n.text(en: "Screen Time", es: "Tiempo en Pantalla"))
     }
 
     private var configurationTitle: String {

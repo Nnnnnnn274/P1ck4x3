@@ -30,13 +30,7 @@ struct DockCustomizerView: View {
         .background(Color(uiColor: .systemGroupedBackground))
         .navigationTitle("Dock")
         .navigationBarTitleDisplayMode(.inline)
-        .alert(item: $alert) { alert in
-            Alert(
-                title: Text("Dock"),
-                message: Text(alert.message),
-                dismissButton: .default(Text("OK"))
-            )
-        }
+        .eagleNotice(item: $alert, title: "Dock") { $0.message }
         .overlay {
             if isApplying {
                 ZStack {
@@ -244,14 +238,14 @@ struct DockCustomizerView: View {
                      : LaraL10n.text(en: "Apply \(selectedCapacity)-Icon Dock", es: "Aplicar Dock de \(selectedCapacity) iconos"))
             }
             .font(.headline)
-            .foregroundStyle(.white)
+            .foregroundStyle(EagleVisualTheme.actionText)
             .frame(maxWidth: .infinity)
             .frame(height: 52)
             .background(
-                Color.accentColor.gradient,
+                EagleVisualTheme.actionFill,
                 in: RoundedRectangle(cornerRadius: 15, style: .continuous)
             )
-            .shadow(color: Color.accentColor.opacity(0.28), radius: 10, y: 4)
+            .shadow(color: Color.primary.opacity(0.12), radius: 10, y: 4)
             .contentShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
         }
         .buttonStyle(DockPressButtonStyle())

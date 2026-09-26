@@ -36,6 +36,12 @@ nonisolated struct IslandLiveTheme: Decodable, Identifiable, Sendable {
     let previewURL: URL
     let posterURL: URL
     var id: String { manifest.id }
+    // Still sources are packaged as 17 repeated frames for the same native
+    // renderer. Classify by verified frame hashes, not the ZIP frame count.
+    var isAnimated: Bool {
+        guard let first = manifest.frameSHA256.first else { return false }
+        return manifest.frameSHA256.dropFirst().contains { $0 != first }
+    }
 
     private enum CodingKeys: String, CodingKey { case title, titleES, accent, previewURL, posterURL }
     init(from decoder: Decoder) throws {

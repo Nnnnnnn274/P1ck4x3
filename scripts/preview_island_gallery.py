@@ -27,11 +27,13 @@ media = media.replace('        if !forceRefresh, loadedURL == url, case .loaded 
         let file = Bundle.main.bundleURL.appendingPathComponent("previews/" + url.lastPathComponent)
         if let data = try? Data(contentsOf: file) {
             loadedURL = url
-            state = .loaded(data, Self.mimeType(for: url, response: nil))
+            state = .loaded(data, Self.mimeType(for: url, response: nil), UUID())
             return
         }
         if !forceRefresh, loadedURL == url, case .loaded = state {''')
 presentation = (repo / "lara/views/new/IslandGalleryPresentation.swift").read_text()
+motion = (repo / "lara/views/new/EagleGalleryMotion.swift").read_text()
+position = (repo / "lara/views/new/GalleryPositionControl.swift").read_text()
 shell = (repo / "lara/views/new/EagleAppShellView.swift").read_text().split("private struct TelegramSafariView:")[0]
 # QA-only scroll position; the production view and native controls stay unchanged.
 presentation = presentation.replace("collectionSection(proxy: proxy)", 'collectionSection(proxy: proxy).id("qa-collection")', 1)
@@ -77,6 +79,15 @@ struct EagleRainbowSpinner: View {
     var size: CGFloat
     var body: some View { ProgressView().frame(width: size, height: size) }
 }
+@MainActor final class EagleNotifications: ObservableObject {
+    static let shared = EagleNotifications()
+    @Published var visible = false
+    func result(_ succeeded: Bool, title: String, message: String) {}
+}
+extension View {
+    func eagleNotice<Item: Identifiable>(item: Binding<Item?>, title: String,
+        message: @escaping (Item) -> String) -> some View { self }
+}
 @MainActor final class EagleSceneManager: ObservableObject {
     static let shared = EagleSceneManager()
     struct Notice: Identifiable { let id = UUID(); let message: String }
@@ -95,9 +106,15 @@ struct EagleBeta10AccessView: View {
 }
 struct LaraHomeView: View {
     var body: some View {
-        NavigationStack {
-            NavigationLink("Open Island Gallery") { IslandGalleryView(preview: true) }
-                .navigationTitle("Customize")
+        Group {
+            if CommandLine.arguments.contains("--direct") {
+                NavigationStack { IslandGalleryView(preview: true) }
+            } else {
+                NavigationStack {
+                    NavigationLink("Open Island Gallery") { IslandGalleryView(preview: true) }
+                        .navigationTitle("Customize")
+                }
+            }
         }
     }
 }
@@ -134,7 +151,7 @@ extension IslandGalleryView {
 }
 '''
 swift = work / "Gallery.swift"
-swift.write_text(style + model + language + media + presentation + shell + stub)
+swift.write_text(style + model + language + motion + position + media + presentation + shell + stub)
 (app / "Info.plist").write_bytes(plistlib.dumps({
     "CFBundleIdentifier": "local.eagle.island-gallery-preview",
     "CFBundleExecutable": "IslandGalleryPreview", "CFBundleName": "Island Gallery Preview",

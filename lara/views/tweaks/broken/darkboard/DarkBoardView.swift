@@ -162,9 +162,13 @@ struct DarkBoardView: View {
                         .background(
                             !hasChosenArtwork && manager.selectedIconShape == .original
                                 ? Color.secondary.opacity(0.25)
-                                : Color.accentColor
+                                : EagleVisualTheme.actionFill
                         )
-                        .foregroundStyle(.white)
+                        .foregroundStyle(
+                            !hasChosenArtwork && manager.selectedIconShape == .original
+                                ? Color.primary.opacity(0.55)
+                                : EagleVisualTheme.actionText
+                        )
                         .clipShape(RoundedRectangle(cornerRadius: 14))
                         .padding()
                 }
@@ -681,8 +685,8 @@ private struct ThemeCardView: View {
                     : LaraL10n.text(en: "Selected: \(selectionIndex! + 1)", es: "Seleccionado: \(selectionIndex! + 1)"))
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 10)
-                    .background(selectionIndex == nil ? Color.secondary.opacity(0.2) : Color.accentColor)
-                    .foregroundStyle(selectionIndex == nil ? Color.primary : Color.white)
+                    .background(selectionIndex == nil ? Color.secondary.opacity(0.2) : EagleVisualTheme.actionFill)
+                    .foregroundStyle(selectionIndex == nil ? Color.primary : EagleVisualTheme.actionText)
                     .clipShape(RoundedRectangle(cornerRadius: 10))
             }
 

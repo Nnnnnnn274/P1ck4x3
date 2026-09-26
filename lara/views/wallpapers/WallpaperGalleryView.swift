@@ -659,21 +659,14 @@ private struct CommunityWallpaperDetail: View {
                 .accessibilityValue(wallpaper.name)
             }
         }
-        .alert("Fondos", isPresented: Binding(
-            get: { gallery.resultMessage != nil },
-            set: { if !$0 { gallery.clearResult() } }
-        )) {
-            if gallery.didInstall {
-                Button("Abrir Fondos") {
-                    gallery.clearResult()
-                    gallery.openWallpaperPicker()
-                }
-                Button("Después", role: .cancel) { gallery.clearResult() }
-            } else {
-                Button("Aceptar", role: .cancel) { gallery.clearResult() }
-            }
-        } message: {
-            Text(gallery.resultMessage ?? "")
+        .onChange(of: gallery.resultMessage) { value in
+            guard let value else { return }
+            let installed = gallery.didInstall
+            EagleNotifications.shared.show(title: LaraL10n.text(en: "Wallpapers", es: "Fondos"),
+                message: value, kind: installed ? .success : .error,
+                actionTitle: installed ? LaraL10n.text(en: "Open Wallpapers", es: "Abrir Fondos") : nil,
+                action: installed ? { gallery.openWallpaperPicker() } : nil)
+            gallery.clearResult()
         }
     }
 }

@@ -2332,6 +2332,7 @@ struct CompleteStylesView: View {
     @ObservedObject private var mgr = laramgr.shared
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var confirmRestore = false
+    @State private var notificationDetails: CompleteStyleRunResult?
 
     private let columns = [
         GridItem(.flexible(), spacing: 12),
@@ -2517,7 +2518,17 @@ struct CompleteStylesView: View {
         } message: {
             Text("Eagle restaurará los respaldos del código y la tarjeta, y retirará los fondos agregados desde Estilos.")
         }
-        .sheet(item: $manager.lastResult) { result in
+        .onChange(of: manager.lastResult?.id) { _ in
+            guard let result = manager.lastResult else { return }
+            let failed = result.components.contains { $0.state == .failed }
+            let allApplied = !result.components.isEmpty && result.components.allSatisfy { $0.state == .applied }
+            EagleNotifications.shared.show(title: result.title, message: result.message,
+                kind: failed ? .error : (allApplied ? .success : .information),
+                actionTitle: LaraL10n.text(en: "View details", es: "Ver detalles"),
+                action: { notificationDetails = result })
+            manager.lastResult = nil
+        }
+        .sheet(item: $notificationDetails) { result in
             CompleteStyleResultView(result: result)
         }
     }
@@ -2810,7 +2821,8 @@ private struct CompleteStyleDetailView: View {
                 .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
-            .tint(pack.secondary.color)
+            .tint(EagleVisualTheme.actionFill)
+            .foregroundStyle(EagleVisualTheme.actionText)
             .controlSize(.large)
             .disabled(manager.isWorking || !mgr.sbxready || !(includeWallpaper || includePasscode || includeCard))
         }

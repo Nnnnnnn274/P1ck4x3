@@ -536,7 +536,7 @@ struct RemoteView: View {
                 self.mgr.logmsg("(rc) \(result)")
                 onComplete?(result)
                 if self.isRemoteCallFailure(result) {
-                    Alertinator.shared.alert(title: "\(name) Failed", body: result)
+                    Alertinator.shared.notice(title: "\(name) Failed", body: result, succeeded: false)
                 }
                 self.running = false
             }

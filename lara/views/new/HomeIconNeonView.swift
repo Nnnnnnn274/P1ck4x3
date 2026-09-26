@@ -251,13 +251,7 @@ struct HomeIconNeonView: View {
                 standaloneEditor
             }
         }
-        .alert(item: $notice) { notice in
-            Alert(
-                title: Text(LaraL10n.text(en: "Home Icon Neon", es: "Neón de iconos")),
-                message: Text(notice.message),
-                dismissButton: .default(Text("OK"))
-            )
-        }
+        .eagleNotice(item: $notice, title: LaraL10n.text(en: "Home Icon Neon", es: "Neón de iconos")) { $0.message }
         .overlay {
             if isApplying {
                 ZStack {
@@ -715,7 +709,8 @@ struct HomeIconNeonView: View {
             .frame(maxWidth: .infinity, minHeight: 52)
         }
         .buttonStyle(.borderedProminent)
-        .tint(.accentColor)
+        .tint(EagleVisualTheme.actionFill)
+        .foregroundStyle(EagleVisualTheme.actionText)
         .disabled(
             isApplying || !mgr.dsready || mgr.rcSafetyLocked ||
             !supportedDevice || !policyAllowsApply

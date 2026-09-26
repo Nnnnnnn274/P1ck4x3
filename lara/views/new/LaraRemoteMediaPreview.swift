@@ -18,7 +18,7 @@ extension EnvironmentValues {
 private final class LaraRemoteMediaLoader: ObservableObject {
     enum State {
         case loading
-        case loaded(Data, String)
+        case loaded(Data, String, UUID)
         case failed
     }
 
@@ -52,7 +52,11 @@ private final class LaraRemoteMediaLoader: ObservableObject {
         state = .loading
 
         if !forceRefresh, let cached = Self.cache.object(forKey: url as NSURL) {
-            state = .loaded(cached as Data, Self.mimeType(for: url, response: nil))
+            state = .loaded(
+                cached as Data,
+                Self.mimeType(for: url, response: nil),
+                requestGeneration
+            )
             return
         }
 
@@ -87,7 +91,11 @@ private final class LaraRemoteMediaLoader: ObservableObject {
 
                 Self.cache.setObject(data as NSData, forKey: url as NSURL, cost: data.count)
                 guard generation == requestGeneration else { return }
-                state = .loaded(data, Self.mimeType(for: url, response: response))
+                state = .loaded(
+                    data,
+                    Self.mimeType(for: url, response: response),
+                    requestGeneration
+                )
                 return
             } catch is CancellationError {
                 return
@@ -124,6 +132,7 @@ struct LaraRemoteMediaPreview: View {
     var showsRetry = true
     var compactPlaceholder = false
     var background = Color(uiColor: .tertiarySystemFill)
+    var presentationMotion = false
     var onReady: ((Bool) -> Void)? = nil
 
     @StateObject private var loader = LaraRemoteMediaLoader()
@@ -143,8 +152,8 @@ struct LaraRemoteMediaPreview: View {
                 switch loader.state {
                 case .loading:
                     loadingView
-                case .loaded(let data, let mimeType):
-                    loadedView(data: data, mimeType: mimeType)
+                case .loaded(let data, let mimeType, let contentID):
+                    loadedView(data: data, mimeType: mimeType, contentID: contentID)
                 case .failed:
                     unavailableView
                 }
@@ -152,6 +161,9 @@ struct LaraRemoteMediaPreview: View {
                 unavailableView
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .clipped()
+        .animation(reduceMotion ? nil : .easeOut(duration: 0.26), value: previewPhase)
         .onAppear { visible = true }
         .onDisappear {
             visible = false
@@ -183,15 +195,33 @@ struct LaraRemoteMediaPreview: View {
     }
 
     @ViewBuilder
-    private func loadedView(data: Data, mimeType: String) -> some View {
+    private func loadedView(data: Data, mimeType: String, contentID: UUID) -> some View {
         if animated && shouldLoad && !reduceMotion {
-            LaraAnimatedDataView(data: data, mimeType: mimeType, contentMode: contentMode)
+            LaraAnimatedDataView(
+                data: data,
+                mimeType: mimeType,
+                contentMode: contentMode,
+                contentID: contentID
+            )
+            .transition(.opacity.combined(with: .scale(scale: 0.985)))
         } else if let image = UIImage(data: data) {
             Image(uiImage: image)
                 .resizable()
                 .aspectRatio(contentMode: contentMode)
+                .eagleGalleryPresentationMotion(
+                    active: presentationMotion && shouldLoad
+                )
+                .transition(.opacity.combined(with: .scale(scale: 0.985)))
         } else {
             unavailableView
+        }
+    }
+
+    private var previewPhase: Int {
+        switch loader.state {
+        case .loading: return 0
+        case .loaded: return 1
+        case .failed: return 2
         }
     }
 
@@ -199,7 +229,7 @@ struct LaraRemoteMediaPreview: View {
         VStack(spacing: 9) {
             EagleRainbowSpinner(size: 22)
             if !compactPlaceholder {
-                Text("Cargando vista previa…")
+                Text(LaraL10n.text(en: "Loading preview…", es: "Cargando vista previa…"))
                 .font(.caption)
                 .foregroundStyle(.secondary)
             }
@@ -212,13 +242,13 @@ struct LaraRemoteMediaPreview: View {
                 .font(.title2)
                 .foregroundStyle(.secondary)
             if !compactPlaceholder {
-                Text("Vista previa no disponible")
+                Text(LaraL10n.text(en: "Preview unavailable", es: "Vista previa no disponible"))
                 .font(.caption.weight(.medium))
                 .foregroundStyle(.secondary)
             }
 
             if showsRetry, url != nil {
-                Button("Intentar de nuevo") {
+                Button(LaraL10n.text(en: "Try again", es: "Intentar de nuevo")) {
                     retryID += 1
                 }
                 .font(.caption.weight(.semibold))
@@ -234,9 +264,12 @@ private struct LaraAnimatedDataView: UIViewRepresentable {
     let data: Data
     let mimeType: String
     let contentMode: ContentMode
+    let contentID: UUID
 
     final class Coordinator {
-        var fingerprint: Int?
+        var contentID: UUID?
+        var mimeType = ""
+        var fill = false
     }
 
     func makeCoordinator() -> Coordinator { Coordinator() }
@@ -258,21 +291,20 @@ private struct LaraAnimatedDataView: UIViewRepresentable {
         webView.stopLoading()
         webView.navigationDelegate = nil
         webView.loadHTMLString("", baseURL: nil)
-        coordinator.fingerprint = nil
+        coordinator.contentID = nil
     }
 
     func updateUIView(_ webView: WKWebView, context: Context) {
-        var hasher = Hasher()
-        hasher.combine(data.count)
-        hasher.combine(data.prefix(64))
-        hasher.combine(mimeType)
-        hasher.combine(contentMode == .fill)
-        let fingerprint = hasher.finalize()
-        guard context.coordinator.fingerprint != fingerprint else { return }
-        context.coordinator.fingerprint = fingerprint
+        let fill = contentMode == .fill
+        guard context.coordinator.contentID != contentID ||
+                context.coordinator.mimeType != mimeType ||
+                context.coordinator.fill != fill else { return }
+        context.coordinator.contentID = contentID
+        context.coordinator.mimeType = mimeType
+        context.coordinator.fill = fill
 
         let encoded = data.base64EncodedString()
-        let objectFit = contentMode == .fill ? "cover" : "contain"
+        let objectFit = fill ? "cover" : "contain"
         let html = """
         <html><head><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
         <style>*{margin:0;padding:0}html,body{width:100%;height:100%;overflow:hidden;background:transparent}img{width:100%;height:100%;object-fit:\(objectFit)}</style>

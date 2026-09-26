@@ -16,7 +16,7 @@ required_presentation = (
     "Slider(value: $shadowIntensity, in: 0...1, step: 0.01)",
     "shadowIntensity: shadowIntensity",
     "0.9 * shadowIntensity",
-    "12 * shadowIntensity",
+    "17 * shadowIntensity",
     'en: "No shadow", es: "Sin sombra"',
 )
 for snippet in required_presentation:

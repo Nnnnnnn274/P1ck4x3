@@ -43,7 +43,19 @@ private struct PressableCardButtonStyle: ButtonStyle {
     }
 }
 
+enum SettingsDestination {
+    case preferences
+    case laboratory
+}
+
+struct LaboratoryToolsView: View {
+    var body: some View {
+        SettingsView(destination: .laboratory)
+    }
+}
+
 struct SettingsView: View {
+    var destination: SettingsDestination = .preferences
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var mgr: laramgr
     @AppStorage(EagleReleaseChannel.storageKey)
@@ -76,6 +88,52 @@ struct SettingsView: View {
 
     private var advancedToolsAllowed: Bool {
         EagleFeaturePolicy.allows(.advancedSystemTools, channel: channel)
+    }
+
+    private var laboratoryIntro: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 10) {
+                Image(systemName: "testtube.2")
+                    .font(.title2.weight(.semibold))
+                    .frame(width: 42, height: 42)
+                    .background(Color.primary.opacity(0.08), in: RoundedRectangle(cornerRadius: 12))
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(LaraL10n.text(en: "System laboratory", es: "Laboratorio del sistema"))
+                        .font(.headline)
+                    Text("Kernelcache · Offsets · RemoteCall")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            HStack(spacing: 8) {
+                laboratoryStatus(
+                    LaraL10n.text(en: "Access", es: "Acceso"),
+                    ready: mgr.dsready
+                )
+                laboratoryStatus(
+                    LaraL10n.text(en: "Offsets", es: "Offsets"),
+                    ready: mgr.hasOffsets
+                )
+            }
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color(uiColor: .secondarySystemGroupedBackground),
+                    in: RoundedRectangle(cornerRadius: 20))
+    }
+
+    private func laboratoryStatus(_ title: String, ready: Bool) -> some View {
+        HStack(spacing: 6) {
+            Circle()
+                .fill(ready ? Color.primary : Color.secondary.opacity(0.4))
+                .frame(width: 7, height: 7)
+            Text(title)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(ready ? Color.primary : Color.secondary)
+        }
+        .padding(.horizontal, 10)
+        .frame(height: 30)
+        .background(Color.primary.opacity(0.05), in: Capsule())
     }
 
     private var developerCard: some View {
@@ -137,6 +195,7 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             List {
+                if destination == .preferences {
                 Section {
                     developerCard
                         .listRowInsets(EdgeInsets(top: 4, leading: 20, bottom: 14, trailing: 20))
@@ -203,8 +262,25 @@ struct SettingsView: View {
                         ))
                     }
                 }
+                } else {
+                    Section {
+                        laboratoryIntro
+                            .listRowInsets(EdgeInsets(top: 4, leading: 20, bottom: 12, trailing: 20))
+                            .listRowBackground(Color.clear)
+                            .listRowSeparator(.hidden)
+                    }
+                    if !advancedToolsAllowed {
+                        Section {
+                            Text(LaraL10n.text(
+                                en: "Choose the Laboratory channel on Customize to use these tools.",
+                                es: "Elige el canal Laboratorio en Personalizar para usar estas herramientas."
+                            ))
+                            .foregroundStyle(.secondary)
+                        }
+                    }
+                }
                 
-                if advancedToolsAllowed {
+                if destination == .laboratory && advancedToolsAllowed {
                     Section(header: HeaderLabel(text: "Exploit", icon: "ant")) {
                     Picker(
                         LaraL10n.text(en: "Access method", es: "Método de acceso"),
@@ -229,7 +305,7 @@ struct SettingsView: View {
                 }
                 
                 // kernelcache
-                if advancedToolsAllowed {
+                if destination == .laboratory && advancedToolsAllowed {
                     Section {
                     if !mgr.hasOffsets {
                         // this does not need to be here any longer, but i'll keep it here anyways.
@@ -300,7 +376,7 @@ struct SettingsView: View {
                 }
                 
                 // tips
-                if advancedToolsAllowed && showkcachetips {
+                if destination == .laboratory && advancedToolsAllowed && showkcachetips {
                     Section {
                         VStack(alignment: .leading, spacing: 6) {
                             Text("How to obtain a kernelcache (macOS)")
@@ -336,6 +412,7 @@ struct SettingsView: View {
                     }
                 }
                 
+                if destination == .preferences {
                 Section(header: HeaderLabel(text: "App", icon: "gearshape"), footer: Text("If keep alive is enabled, the app will continue running even if it is minimized.")) {
                     Toggle("Keep Alive", isOn: $keepAlive)
                         .onChange(of: keepAlive) { _ in
@@ -363,9 +440,10 @@ struct SettingsView: View {
                     Toggle("Show File Manager in Tabs", isOn: $showFMInTabs)
                     }
                 }
+                }
                 
                 #if !DISABLE_REMOTECALL
-                if advancedToolsAllowed {
+                if destination == .laboratory && advancedToolsAllowed {
                     Section(header: HeaderLabel(text: "RemoteCall", icon: "syringe")) {
                     Toggle("Stash KRW primitives", isOn: $stashKRW)
                         .onChange(of: stashKRW) { enabled in
@@ -418,14 +496,16 @@ struct SettingsView: View {
                 }
                 #endif
             }
-            .navigationTitle(LaraL10n.text(en: "Advanced Settings", es: "Ajustes avanzados"))
+            .navigationTitle(destination == .laboratory
+                ? LaraL10n.text(en: "Laboratory Tools", es: "Herramientas de Laboratorio")
+                : LaraL10n.text(en: "Settings", es: "Ajustes"))
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button {
                         dismiss()
                     } label: {
                         Text(LaraL10n.text(en: "Close", es: "Cerrar"))
-                            .foregroundStyle(EagleVisualTheme.accent)
+                            .foregroundStyle(.primary)
                     }
                 }
             }

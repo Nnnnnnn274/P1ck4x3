@@ -19,7 +19,7 @@ struct LaraCustomApp: App {
     @AppStorage(LaraLanguage.storageKey) private var language = LaraLanguage.english
     @AppStorage(EagleAppearanceMode.storageKey)
     private var appearanceModeRaw = EagleAppearanceMode.dark.rawValue
-    @AppStorage("eagle.updates.galleryStability.completed")
+    @AppStorage("eagle.updates.visualPolish105.build92.completed")
     private var hasSeenStableUpdate = false
     @State private var showingStableUpdate = false
 
@@ -50,6 +50,7 @@ struct LaraCustomApp: App {
     var body: some Scene {
         WindowGroup {
             EagleAppShellView()
+            .background(EagleNotificationInstaller().frame(width: 0, height: 0))
             .environmentObject(mgr)
             .environment(\.locale, language.locale)
             .preferredColorScheme(preferredColorScheme)
