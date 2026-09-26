@@ -227,14 +227,6 @@ struct GestaltView: View {
                         )
                     )
 
-                    PlainToggle(
-                        text: "Disable Breadcrumbs",
-                        icon: "chevron.backward",
-                        isOn: nuggetbinding(
-                            "SBNeverBreadcrumb",
-                            path: fileloc.springboard.rawValue
-                        )
-                    )
                 } header: {
                     HeaderLabel(text: "UI Tweaks", icon: "eye")
                 }
@@ -613,7 +605,6 @@ struct GestaltView: View {
             ("SBDisableClockIconSecondsHand", fileloc.globalprefs.rawValue),
             ("SBHardwareButtonHintDropletsAlwaysVisibleInSnapshots", fileloc.globalprefs.rawValue),
             ("BKHideAppleLogoOnLaunch", fileloc.backboardd.rawValue),
-            ("SBNeverBreadcrumb", fileloc.springboard.rawValue),
             ("SBShowSupervisionTextOnLockScreen", fileloc.springboard.rawValue),
 
             ("OverrideTimeLimitEveryoneMode", fileloc.airdrop.rawValue),
@@ -688,7 +679,6 @@ struct GestaltView: View {
             ("SBDisableClockIconSecondsHand", fileloc.globalprefs.rawValue),
             ("SBHardwareButtonHintDropletsAlwaysVisibleInSnapshots", fileloc.globalprefs.rawValue),
             ("BKHideAppleLogoOnLaunch", fileloc.backboardd.rawValue),
-            ("SBNeverBreadcrumb", fileloc.springboard.rawValue),
             ("SBShowSupervisionTextOnLockScreen", fileloc.springboard.rawValue),
 
             ("OverrideTimeLimitEveryoneMode", fileloc.airdrop.rawValue),

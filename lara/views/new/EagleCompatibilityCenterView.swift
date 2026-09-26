@@ -75,7 +75,16 @@ struct EagleCompatibilityCenterView: View {
                     .font(.footnote)
                     .foregroundStyle(.secondary)
 
-                ForEach(EagleProductFeature.allCases) { feature in
+                if EagleFeaturePolicy.allows(.advancedSystemTools, channel: channel) {
+                    NavigationLink(destination: EagleLaboratoryView()) {
+                        Label(
+                            LaraL10n.text(en: "Open Laboratory tools", es: "Abrir herramientas de Laboratorio"),
+                            systemImage: "flask.fill"
+                        )
+                    }
+                }
+
+                ForEach(EagleProductFeature.allCases.filter { $0 != .islandTint }) { feature in
                     let enabled = EagleFeaturePolicy.allows(feature, channel: channel)
                     HStack(spacing: 12) {
                         Image(systemName: enabled ? "checkmark.circle.fill" : "lock.circle")

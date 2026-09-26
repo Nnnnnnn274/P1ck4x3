@@ -61,6 +61,7 @@ enum EagleProductFeature: String, CaseIterable, Identifiable {
     case islandTint
     case homeIconNeon
     case homeLabelColor
+    case controlCenterThemes
     case advancedSystemTools
 
     var id: String { rawValue }
@@ -72,7 +73,7 @@ enum EagleProductFeature: String, CaseIterable, Identifiable {
             return .stable
         case .scenes, .auraPulse, .homeIconNeon, .homeLabelColor:
             return .beta
-        case .islandTint, .advancedSystemTools:
+        case .islandTint, .controlCenterThemes, .advancedSystemTools:
             return .experimental
         }
     }
@@ -92,6 +93,8 @@ enum EagleProductFeature: String, CaseIterable, Identifiable {
             return LaraL10n.text(en: "Home Icon Neon", es: "Neón de iconos")
         case .homeLabelColor:
             return LaraL10n.text(en: "App Name Color", es: "Color de nombres")
+        case .controlCenterThemes:
+            return LaraL10n.text(en: "Control Center Accents", es: "Acentos del Centro de control")
         case .advancedSystemTools:
             return LaraL10n.text(en: "Advanced system tools", es: "Herramientas avanzadas del sistema")
         }
@@ -103,7 +106,10 @@ enum EagleFeaturePolicy {
         _ feature: EagleProductFeature,
         channel: EagleReleaseChannel
     ) -> Bool {
-        channel.level >= feature.minimumChannel.level
+        // Aura Studio intentionally keeps True Tint hidden until its native
+        // host is validated. A channel selection must not report it as usable.
+        if feature == .islandTint { return false }
+        return channel.level >= feature.minimumChannel.level
     }
 
     static func channel(from rawValue: String) -> EagleReleaseChannel {

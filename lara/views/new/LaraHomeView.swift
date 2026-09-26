@@ -3,6 +3,8 @@ import SwiftUI
 struct LaraHomeView: View {
     @ObservedObject private var manager = laramgr.shared
     @AppStorage(LaraLanguage.storageKey) private var language = LaraLanguage.english
+    @AppStorage(EagleReleaseChannel.storageKey)
+    private var channelRaw = EagleReleaseChannel.stable.rawValue
     @State private var showingSettings = false
 
     private let columns = [
@@ -110,6 +112,34 @@ struct LaraHomeView: View {
                         icon: "wand.and.stars",
                         destination: CompleteStylesView()
                     )
+                }
+
+                if EagleFeaturePolicy.allows(
+                    .advancedSystemTools,
+                    channel: EagleFeaturePolicy.channel(from: channelRaw)
+                ) {
+                    P1ckSectionTitle(
+                        eyebrow: LaraL10n.text(en: "Laboratory", es: "Laboratorio"),
+                        title: LaraL10n.text(en: "Advanced tools are unlocked.", es: "Herramientas avanzadas disponibles."),
+                        detail: LaraL10n.text(
+                            en: "Open offset, kernelcache and RemoteCall controls from one place.",
+                            es: "Abre controles de offsets, kernelcache y RemoteCall desde un solo lugar."
+                        )
+                    )
+                    LazyVGrid(columns: columns, spacing: 12) {
+                        P1ckToolTile(
+                            title: LaraL10n.text(en: "Laboratory", es: "Laboratorio"),
+                            detail: LaraL10n.text(en: "Explore advanced controls", es: "Explora controles avanzados"),
+                            icon: "flask.fill",
+                            destination: EagleLaboratoryView()
+                        )
+                        P1ckToolTile(
+                            title: LaraL10n.text(en: "Control Center", es: "Centro de control"),
+                            detail: LaraL10n.text(en: "Live module accents", es: "Acentos temporales para módulos"),
+                            icon: "square.grid.2x2.fill",
+                            destination: ControlCenterThemesView()
+                        )
+                    }
                 }
 
                 P1ckPanel {

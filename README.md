@@ -58,6 +58,8 @@
 | 🖼️ **Island Gallery** | Applies calibrated photo styles at verified size and position. |
 | 🌈 **Dock Gallery** | Places exact-size artwork behind Dock apps without stretching. |
 | 🔤 **App Name Color** | Applies solid color to app names on the current Home Screen page. |
+| 🧪 **Laboratory** | Reveals advanced offset, Kernelcache and RemoteCall controls when selected in Compatibility. |
+| 🎛️ **Control Center Accents** | Adds temporary Mint, Ocean or Rose borders to recognized Control Center modules on iOS 18. Requires Laboratory; a respring clears the effect. |
 | 🛡️ **P1ck4x3 System** | Guardian checks, Scenes and shareable personalization recipes. |
 
 ## Install P1ck4x3

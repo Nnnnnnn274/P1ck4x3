@@ -214,8 +214,8 @@ struct DockCustomizerView: View {
                 Text(LaraL10n.text(en: "Add apps after applying", es: "Añade apps después de aplicar"))
                     .font(.subheadline.weight(.semibold))
                 Text(LaraL10n.text(
-                    en: "Eagle creates the extra Dock spaces. Return to the Home Screen, then drag apps into them. A respring or reboot returns the standard layout.",
-                    es: "Eagle crea los espacios adicionales. Vuelve a la pantalla de inicio y arrastra apps al Dock. Un respring o reinicio devuelve el diseño estándar."
+                    en: "P1ck4x3 creates the extra Dock spaces. Return to the Home Screen, then drag apps into them. A respring or reboot returns the standard layout.",
+                    es: "P1ck4x3 crea los espacios adicionales. Vuelve a la pantalla de inicio y arrastra apps al Dock. Un respring o reinicio devuelve el diseño estándar."
                 ))
                     .font(.footnote)
                     .foregroundStyle(.secondary)
@@ -291,22 +291,58 @@ struct DockCustomizerView: View {
 
     private func applySelectedCapacity() {
         guard !isApplying else { return }
+        guard !isdebugged() else {
+            finishWithError(LaraL10n.text(
+                en: "Stop the Xcode run and open P1ck4x3 from the Home Screen before changing the Dock.",
+                es: "Detén la ejecución de Xcode y abre P1ck4x3 desde Inicio antes de cambiar el Dock."
+            ))
+            return
+        }
+        guard !mgr.rcSafetyLocked else {
+            finishWithError(LaraL10n.text(
+                en: "The protected SpringBoard connection is safety locked. Close and reopen P1ck4x3 before retrying.",
+                es: "La conexión protegida de SpringBoard está bloqueada por seguridad. Cierra P1ck4x3 y vuelve a abrirlo antes de reintentar."
+            ))
+            return
+        }
         isApplying = true
 
         let applyWithSession = {
             guard let process = self.mgr.sbProc else {
                 self.finishWithError(LaraL10n.text(
-                    en: "Eagle connected to SpringBoard but did not receive a live session.",
-                    es: "Eagle se conectó a SpringBoard, pero no recibió una sesión activa."
+                    en: "P1ck4x3 connected to SpringBoard but did not receive a live session.",
+                    es: "P1ck4x3 se conectó a SpringBoard, pero no recibió una sesión activa."
                 ))
                 return
             }
 
             let capacity = self.selectedCapacity
+            let label = "Dock capacity \(UUID().uuidString)"
+            guard self.mgr.beginExclusiveRemoteCall(label: label) else {
+                self.finishWithError(LaraL10n.text(
+                    en: "Another protected SpringBoard operation is active. Try again after it finishes.",
+                    es: "Hay otra operación protegida de SpringBoard activa. Inténtalo cuando termine."
+                ))
+                return
+            }
             DispatchQueue.global(qos: .userInitiated).async {
                 let capacityResult = set_dock_icon_count(process, Int32(capacity))
+                let healthy = process.isHealthy
+                let timedOut = process.lastCallTimedOut
+                let transportError = process.lastError
                 DispatchQueue.main.async {
+                    self.mgr.endExclusiveRemoteCall(label: label)
                     self.isApplying = false
+                    if !healthy || timedOut || transportError?.isEmpty == false {
+                        self.mgr.quarantineRemoteCall(
+                            reason: transportError ?? "Dock capacity call became unhealthy"
+                        )
+                        self.alert = EagleDockAlert(message: LaraL10n.text(
+                            en: "The Dock result could not be verified. Close and reopen P1ck4x3 before retrying.",
+                            es: "No se pudo verificar el resultado del Dock. Cierra P1ck4x3 y vuelve a abrirlo antes de reintentar."
+                        ))
+                        return
+                    }
                     if capacityResult == 0 {
                         self.alert = EagleDockAlert(message: LaraL10n.text(
                             en: "The Dock now accepts \(capacity) icons. Return to the Home Screen and drag apps into the new spaces.",
@@ -326,8 +362,8 @@ struct DockCustomizerView: View {
 
         guard mgr.dsready else {
             finishWithError(LaraL10n.text(
-                en: "Complete Eagle setup before changing the Dock.",
-                es: "Completa la preparación de Eagle antes de cambiar el Dock."
+                en: "Complete P1ck4x3 setup before changing the Dock.",
+                es: "Completa la preparación de P1ck4x3 antes de cambiar el Dock."
             ))
             return
         }
@@ -340,8 +376,8 @@ struct DockCustomizerView: View {
                 self.finishWithError(detail?.isEmpty == false
                     ? detail!
                     : LaraL10n.text(
-                        en: "Eagle could not start the live SpringBoard session.",
-                        es: "Eagle no pudo iniciar la sesión en vivo con SpringBoard."
+                        en: "P1ck4x3 could not start the live SpringBoard session.",
+                        es: "P1ck4x3 no pudo iniciar la sesión en vivo con SpringBoard."
                     ))
             }
         }
@@ -363,8 +399,8 @@ struct DockCustomizerView: View {
             )
         case -3:
             return LaraL10n.text(
-                en: "Eagle could not find the active Dock. Unlock the iPhone, visit the Home Screen once, and try again.",
-                es: "Eagle no encontró el Dock activo. Desbloquea el iPhone, visita la pantalla de inicio una vez e inténtalo de nuevo."
+                en: "P1ck4x3 could not find the active Dock. Unlock the iPhone, visit the Home Screen once, and try again.",
+                es: "P1ck4x3 no encontró el Dock activo. Desbloquea el iPhone, visita la pantalla de inicio una vez e inténtalo de nuevo."
             )
         case -5:
             return LaraL10n.text(

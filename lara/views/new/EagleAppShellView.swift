@@ -258,6 +258,8 @@ struct P1ckTabBar: View {
 private struct P1ckAccessView: View {
     @ObservedObject private var manager = laramgr.shared
     @AppStorage(LaraLanguage.storageKey) private var language = LaraLanguage.english
+    @AppStorage(EagleReleaseChannel.storageKey)
+    private var channelRaw = EagleReleaseChannel.stable.rawValue
     @State private var showingSettings = false
     @State private var showingLogs = false
 
@@ -317,6 +319,20 @@ private struct P1ckAccessView: View {
                             }
 
                             divider
+
+                            if EagleFeaturePolicy.allows(
+                                .advancedSystemTools,
+                                channel: EagleFeaturePolicy.channel(from: channelRaw)
+                            ) {
+                                NavigationLink(destination: EagleLaboratoryView()) {
+                                    P1ckAccessRow(
+                                        title: LaraL10n.text(en: "Laboratory", es: "Laboratorio"),
+                                        detail: LaraL10n.text(en: "Offsets, Kernelcache and RemoteCall", es: "Offsets, Kernelcache y RemoteCall"),
+                                        icon: "flask.fill"
+                                    )
+                                }
+                                divider
+                            }
 
                             Button {
                                 showingLogs = true
