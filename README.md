@@ -35,7 +35,7 @@
 
 | | |
 |---|---|
-| **Current codebase** | P1ck4x3 1.0.8 · Eagle 1.0.5 base · build 95 |
+| **Current codebase** | P1ck4x3 1.0.9 · Eagle 1.0.5 base · build 96 |
 | **Primarily verified on** | iPhone 16 Pro (`iPhone17,1`) · iOS 18.6.2 (`22G100`) |
 | **Architecture** | `arm64e` |
 | **Verified Aura surfaces** | Dynamic Island, Dock and current-page icon glow/outline · isolated apply and verification |
