@@ -91,7 +91,7 @@ struct EagleBeta10WelcomeView: View {
                     .font(.headline)
                     .multilineTextAlignment(.center)
 
-                Text("v\(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0.9")  •  \(Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "96")")
+                Text("v\(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0.10")  •  \(Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "97")")
                     .font(.caption.monospacedDigit().weight(.bold))
                     .foregroundStyle(EagleVisualTheme.secondaryText(for: colorScheme))
                     .padding(.horizontal, 12)
