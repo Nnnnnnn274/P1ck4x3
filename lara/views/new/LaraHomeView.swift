@@ -52,8 +52,8 @@ struct LaraHomeView: View {
                                             .font(.title2.bold())
                                             .foregroundStyle(.primary)
                                         Text(LaraL10n.text(
-                                            en: "Edit Home Screen, Dock, and Lock Screen",
-                                            es: "Edita Inicio, Dock y pantalla bloqueada"
+                                            en: "Edit seven parts of your phone",
+                                            es: "Edita siete partes de tu iPhone"
                                         ))
                                         .font(.subheadline)
                                         .foregroundStyle(.secondary)
@@ -798,7 +798,7 @@ private enum LaraHomeToolRoute: String, CaseIterable, Identifiable {
     var subtitle: String {
         switch self {
         case .ultrator:
-            return LaraL10n.text(en: "Home Screen, Dock, and Lock Screen editor", es: "Editor de Inicio, Dock y pantalla bloqueada")
+            return LaraL10n.text(en: "Seven phone areas in one editor", es: "Siete partes del iPhone en un editor")
         case .hideSurfaces:
             return LaraL10n.text(en: "System visibility", es: "Visibilidad del sistema")
         case .completeStyles:
@@ -874,7 +874,7 @@ private enum LaraHomeToolRoute: String, CaseIterable, Identifiable {
 
     var keywords: String {
         switch self {
-        case .ultrator: return "ultra ultrator editor home inicio dock lock bloqueo screen pantalla customize personalizar"
+        case .ultrator: return "ultra ultrator editor home inicio dock lock bloqueo screen pantalla island isla wallet status bar batería notifications notificaciones customize personalizar"
         case .hideSurfaces: return "hide dock island ocultar isla fondo background visibility visibilidad"
         case .completeStyles: return "style styles estilo estilos complete completo visual"
         case .eagleSystem: return "system sistema guardian recovery recuperación"

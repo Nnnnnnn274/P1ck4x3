@@ -50,7 +50,7 @@
 
 | Experience | What it does |
 |---|---|
-| 🎛️ **Ultrator** | Picks Home Screen, Dock or Lock Screen from a phone preview; drafts app name color and Dock capacity, then opens the matching editor to apply. |
+| 🎛️ **Ultrator** | Selects Home Screen, Dock, Lock Screen, Dynamic Island, Wallet, Status Bar or Notifications; drafts supported colors and layouts, then opens the matching editor to apply. Notification color affects P1ck4x3 alerts only. |
 | 🎨 **Styles** | Coordinates wallpaper, passcode and Wallet-card experiences. |
 | 🌌 **Wallpapers** | Browses community packs, imports compatible packages and converts short videos for Pocket Poster. |
 | 💳 **Cards** | Previews, applies, backs up and restores supported Wallet card artwork. |
@@ -62,7 +62,7 @@
 | 🌈 **Dock Gallery** | Places static and Live artwork behind Dock apps, with Saves, adjustable glow and precise placement. |
 | 🔤 **App Name Color · Advanced** | Applies a page-owned solid color to app names on the current Home Screen page. |
 | 🧪 **Laboratory** | Reveals advanced offset, Kernelcache and RemoteCall controls when selected in Compatibility. |
-| 🔒 **Lock Screen Accents** | Adds temporary Mint, Ocean or Rose frames to verified Lock Screen clock and quick-action surfaces on iOS 18. Restore or a respring clears the effect. |
+| 🔒 **Lock Screen Accents** | Adds seven temporary color frames to verified Lock Screen clock and quick-action surfaces on iOS 18. Restore or a respring clears the effect. |
 | 🛡️ **P1ck4x3 System** | Adds Guardian checks, Scenes and shareable personalization recipes. |
 
 ### New from Eagle 1.0.5

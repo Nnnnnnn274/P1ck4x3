@@ -19,7 +19,13 @@ enum EagleNoticeKind: Sendable {
         switch self {
         case .success: return Color(red: 0.33, green: 0.88, blue: 0.58)
         case .error: return Color(red: 1, green: 0.38, blue: 0.39)
-        case .information: return Color(red: 0.43, green: 0.71, blue: 1)
+        case .information:
+            let defaults = UserDefaults.standard
+            return Color(
+                red: min(1, max(0, defaults.object(forKey: "eagle.notice.red") as? Double ?? 0.43)),
+                green: min(1, max(0, defaults.object(forKey: "eagle.notice.green") as? Double ?? 0.71)),
+                blue: min(1, max(0, defaults.object(forKey: "eagle.notice.blue") as? Double ?? 1.0))
+            )
         }
     }
 }

@@ -4,6 +4,10 @@ private enum LockScreenAccent: Int, CaseIterable, Identifiable {
     case mint = 1
     case ocean = 2
     case rose = 3
+    case amber = 4
+    case violet = 5
+    case cyan = 6
+    case sunset = 7
 
     var id: Int { rawValue }
 
@@ -12,6 +16,10 @@ private enum LockScreenAccent: Int, CaseIterable, Identifiable {
         case .mint: return LaraL10n.text(en: "Mint", es: "Menta")
         case .ocean: return LaraL10n.text(en: "Ocean", es: "Océano")
         case .rose: return LaraL10n.text(en: "Rose", es: "Rosa")
+        case .amber: return LaraL10n.text(en: "Amber", es: "Ámbar")
+        case .violet: return LaraL10n.text(en: "Violet", es: "Violeta")
+        case .cyan: return LaraL10n.text(en: "Cyan", es: "Cian")
+        case .sunset: return LaraL10n.text(en: "Sunset", es: "Atardecer")
         }
     }
 
@@ -20,6 +28,10 @@ private enum LockScreenAccent: Int, CaseIterable, Identifiable {
         case .mint: return .green
         case .ocean: return .blue
         case .rose: return .pink
+        case .amber: return .yellow
+        case .violet: return .purple
+        case .cyan: return .cyan
+        case .sunset: return .orange
         }
     }
 }
@@ -225,8 +237,8 @@ struct LockScreenAccentsView: View {
                 Text(LaraL10n.text(en: "Preview", es: "Vista previa"))
             }
 
-            ForEach(LockScreenAccent.allCases) { accent in
-                Section {
+            Section {
+                ForEach(LockScreenAccent.allCases) { accent in
                     Button {
                         apply(accent)
                     } label: {
@@ -245,6 +257,8 @@ struct LockScreenAccentsView: View {
                     }
                     .disabled(isApplying || !manager.dsready || !unlocked)
                 }
+            } header: {
+                Text(LaraL10n.text(en: "Accent color", es: "Color del acento"))
             }
 
             Section {

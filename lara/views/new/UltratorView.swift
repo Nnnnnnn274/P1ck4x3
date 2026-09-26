@@ -5,6 +5,10 @@ private enum UltratorArea: String, CaseIterable, Identifiable {
     case home
     case dock
     case lock
+    case island
+    case wallet
+    case statusBar
+    case notifications
 
     var id: String { rawValue }
 
@@ -13,6 +17,10 @@ private enum UltratorArea: String, CaseIterable, Identifiable {
         case .home: return LaraL10n.text(en: "Home Screen", es: "Pantalla de inicio")
         case .dock: return "Dock"
         case .lock: return LaraL10n.text(en: "Lock Screen", es: "Pantalla bloqueada")
+        case .island: return LaraL10n.text(en: "Dynamic Island", es: "Isla dinámica")
+        case .wallet: return "Wallet"
+        case .statusBar: return LaraL10n.text(en: "Status Bar", es: "Barra de estado")
+        case .notifications: return LaraL10n.text(en: "Notifications", es: "Notificaciones")
         }
     }
 
@@ -21,6 +29,10 @@ private enum UltratorArea: String, CaseIterable, Identifiable {
         case .home: return "square.grid.3x3.fill"
         case .dock: return "dock.rectangle"
         case .lock: return "lock.square.fill"
+        case .island: return "capsule.fill"
+        case .wallet: return "creditcard.fill"
+        case .statusBar: return "battery.100percent"
+        case .notifications: return "bell.badge.fill"
         }
     }
 
@@ -29,6 +41,10 @@ private enum UltratorArea: String, CaseIterable, Identifiable {
         case .home: return .cyan
         case .dock: return .purple
         case .lock: return .pink
+        case .island: return .orange
+        case .wallet: return .mint
+        case .statusBar: return .green
+        case .notifications: return .blue
         }
     }
 }
@@ -41,6 +57,9 @@ struct UltratorView: View {
     @AppStorage("eagle.homeLabelColor.green") private var labelGreen = 1.0
     @AppStorage("eagle.homeLabelColor.blue") private var labelBlue = 1.0
     @AppStorage("eagle.dock.capacity") private var dockCapacity = 5
+    @AppStorage("eagle.islandAura.red") private var islandRed = 0.10
+    @AppStorage("eagle.islandAura.green") private var islandGreen = 0.78
+    @AppStorage("eagle.islandAura.blue") private var islandBlue = 1.0
 
     private var labelColor: Color {
         Color(red: labelRed, green: labelGreen, blue: labelBlue)
@@ -63,6 +82,27 @@ struct UltratorView: View {
         )
     }
 
+    private var islandColor: Color {
+        Color(red: islandRed, green: islandGreen, blue: islandBlue)
+    }
+
+    private var islandColorBinding: Binding<Color> {
+        Binding(
+            get: { islandColor },
+            set: { newValue in
+                let color = UIColor(newValue).resolvedColor(with: .current)
+                var red: CGFloat = 0
+                var green: CGFloat = 0
+                var blue: CGFloat = 0
+                var alpha: CGFloat = 0
+                guard color.getRed(&red, green: &green, blue: &blue, alpha: &alpha) else { return }
+                islandRed = Double(red)
+                islandGreen = Double(green)
+                islandBlue = Double(blue)
+            }
+        )
+    }
+
     private var selectedArea: UltratorArea {
         UltratorArea(rawValue: selectedAreaRaw) ?? .home
     }
@@ -77,6 +117,17 @@ struct UltratorView: View {
             version.majorVersion == 18 &&
             version.minorVersion == 6 &&
             version.patchVersion == 2
+    }
+
+    private var phoneHighlight: (width: CGFloat, height: CGFloat, y: CGFloat) {
+        switch selectedArea {
+        case .home: return (122, 164, -12)
+        case .dock: return (112, 39, 84)
+        case .lock: return (122, 228, 0)
+        case .island: return (46, 18, -103)
+        case .statusBar: return (116, 27, -95)
+        case .wallet, .notifications: return (122, 228, 0)
+        }
     }
 
     var body: some View {
@@ -109,7 +160,7 @@ struct UltratorView: View {
     }
 
     private var areaPicker: some View {
-        HStack(spacing: 8) {
+        LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 8), count: 3), spacing: 8) {
             ForEach(UltratorArea.allCases) { area in
                 Button {
                     withAnimation(.easeInOut(duration: 0.2)) {
@@ -141,6 +192,9 @@ struct UltratorView: View {
 
     private var phonePreview: some View {
         HStack(spacing: 22) {
+            if selectedArea == .wallet || selectedArea == .notifications {
+                alternatePreview
+            } else {
             ZStack {
                 RoundedRectangle(cornerRadius: 27)
                     .fill(Color.black)
@@ -151,7 +205,7 @@ struct UltratorView: View {
                     }
 
                 VStack(spacing: 0) {
-                    Capsule().fill(.white.opacity(0.7))
+                    Capsule().fill(selectedArea == .island ? islandColor : .white.opacity(0.7))
                         .frame(width: 38, height: 9)
                         .padding(.top, 13)
                     Spacer()
@@ -198,19 +252,19 @@ struct UltratorView: View {
 
                 RoundedRectangle(cornerRadius: selectedArea == .dock ? 12 : 20)
                     .stroke(selectedArea.color, lineWidth: 3)
-                    .frame(
-                        width: selectedArea == .dock ? 112 : 122,
-                        height: selectedArea == .dock ? 39 : (selectedArea == .lock ? 228 : 164)
-                    )
-                    .offset(y: selectedArea == .dock ? 84 : (selectedArea == .home ? -12 : 0))
+                    .frame(width: phoneHighlight.width, height: phoneHighlight.height)
+                    .offset(y: phoneHighlight.y)
                     .shadow(color: selectedArea.color.opacity(0.8), radius: 8)
 
                 VStack(spacing: 0) {
-                    previewTarget(.lock, height: 52)
-                    previewTarget(.home, height: 136)
+                    previewTarget(.statusBar, height: 20)
+                    previewTarget(.island, height: 24)
+                    previewTarget(.lock, height: 28)
+                    previewTarget(.home, height: 116)
                     previewTarget(.dock, height: 48)
                 }
                 .frame(width: 126, height: 236)
+            }
             }
 
             VStack(alignment: .leading, spacing: 9) {
@@ -229,6 +283,37 @@ struct UltratorView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color(uiColor: .secondarySystemGroupedBackground),
                     in: RoundedRectangle(cornerRadius: 22))
+    }
+
+    private var alternatePreview: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 27)
+                .fill(Color.black)
+                .frame(width: 126, height: 236)
+            if selectedArea == .wallet {
+                RoundedRectangle(cornerRadius: 14)
+                    .fill(LinearGradient(colors: [.mint, .teal, .indigo],
+                                         startPoint: .topLeading, endPoint: .bottomTrailing))
+                    .frame(width: 108, height: 70)
+                    .overlay(alignment: .bottomLeading) {
+                        Image(systemName: "creditcard.fill")
+                            .foregroundStyle(.white)
+                            .padding(10)
+                    }
+            } else {
+                HStack(spacing: 7) {
+                    Image(systemName: "bell.fill")
+                        .foregroundStyle(.blue)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Capsule().fill(.white).frame(width: 59, height: 6)
+                        Capsule().fill(.white.opacity(0.5)).frame(width: 73, height: 5)
+                    }
+                }
+                .padding(9)
+                .background(.white.opacity(0.16), in: RoundedRectangle(cornerRadius: 14))
+            }
+        }
+        .accessibilityHidden(true)
     }
 
     private func previewTarget(_ area: UltratorArea, height: CGFloat) -> some View {
@@ -261,6 +346,14 @@ struct UltratorView: View {
                 return LaraL10n.text(en: "Wallpaper, passcode, and temporary accents.", es: "Fondo, código y acentos temporales.")
             }
             return LaraL10n.text(en: "Wallpaper and passcode styles.", es: "Fondos y estilos del código.")
+        case .island:
+            return LaraL10n.text(en: "Artwork and a colored glow.", es: "Arte y brillo de color.")
+        case .wallet:
+            return LaraL10n.text(en: "Artwork for supported Wallet cards.", es: "Arte para tarjetas compatibles de Wallet.")
+        case .statusBar:
+            return LaraL10n.text(en: "Battery color and glow.", es: "Color y brillo de batería.")
+        case .notifications:
+            return LaraL10n.text(en: "P1ck4x3 alert appearance.", es: "Aspecto de avisos de P1ck4x3.")
         }
     }
 
@@ -356,12 +449,59 @@ struct UltratorView: View {
                 editorLink("Passcode", es: "Código", detail: "Unlock key styles", detailES: "Números de desbloqueo", symbol: "circle.grid.3x3.fill", color: .purple) {
                     PasscodeView(mgr: laramgr.shared)
                 }
+                editorLink("Complete Styles", es: "Estilos completos", detail: "Match wallpaper, passcode, and card", detailES: "Combina fondo, código y tarjeta", symbol: "square.stack.3d.up.fill", color: .indigo) {
+                    CompleteStylesView()
+                }
                 if ProcessInfo.processInfo.operatingSystemVersion.majorVersion == 18,
                    EagleFeaturePolicy.allows(.lockScreenAccents, channel: channel) {
-                    editorLink("Lock Screen accents", es: "Acentos de bloqueo", detail: "Temporary clock and quick-action frames", detailES: "Marcos temporales", symbol: "lock.square.fill", color: .pink) {
+                    editorLink("Lock Screen accents", es: "Acentos de bloqueo", detail: "Seven temporary clock and action colors", detailES: "Siete colores temporales", symbol: "lock.square.fill", color: .pink) {
                         LockScreenAccentsView()
                     }
                 }
+            case .island:
+                ColorPicker(
+                    LaraL10n.text(en: "Island glow color", es: "Color del brillo de Isla"),
+                    selection: islandColorBinding,
+                    supportsOpacity: false
+                )
+                .padding(16)
+                .background(Color(uiColor: .secondarySystemGroupedBackground),
+                            in: RoundedRectangle(cornerRadius: 16))
+                editorLink("Island glow", es: "Brillo de Isla", detail: "Open Aura Studio to apply", detailES: "Abre Aura Studio para aplicar", symbol: "sparkles", color: .orange) {
+                    AuraStudioView()
+                }
+                editorLink("Island artwork", es: "Arte de Isla", detail: "Live and static gallery styles", detailES: "Estilos animados y estáticos", symbol: "capsule.fill", color: .purple) {
+                    IslandGalleryView()
+                }
+            case .wallet:
+                editorLink("Wallet cards", es: "Tarjetas de Wallet", detail: "Preview, apply, and restore artwork", detailES: "Vista previa, aplicar y restaurar", symbol: "creditcard.fill", color: .mint) {
+                    CardView()
+                }
+                editorLink("Complete Styles", es: "Estilos completos", detail: "Match a card with wallpaper and passcode", detailES: "Combina tarjeta, fondo y código", symbol: "square.stack.3d.up.fill", color: .indigo) {
+                    CompleteStylesView()
+                }
+            case .statusBar:
+                editorLink("Battery Aura", es: "Aura de batería", detail: "Fill, full color, or neon glow", detailES: "Carga, color completo o neón", symbol: "battery.100percent", color: .green) {
+                    BatteryAuraView()
+                }
+                Text(LaraL10n.text(
+                    en: "Battery Aura is available on its verified iOS 17 and 18 battery surfaces. The editor checks support before applying.",
+                    es: "Aura de batería funciona en superficies verificadas de iOS 17 y 18. El editor comprueba la compatibilidad antes de aplicar."
+                ))
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .padding(12)
+            case .notifications:
+                editorLink("P1ck4x3 alerts", es: "Avisos de P1ck4x3", detail: "Choose and preview an information color", detailES: "Elige y prueba un color informativo", symbol: "bell.badge.fill", color: .blue) {
+                    NotificationStudioView()
+                }
+                Text(LaraL10n.text(
+                    en: "System notification banners are not currently editable here.",
+                    es: "Los banners de notificaciones del sistema no se pueden editar aquí por ahora."
+                ))
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .padding(12)
             }
 
             if selectedArea == .lock,
