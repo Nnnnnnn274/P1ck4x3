@@ -1243,21 +1243,15 @@ struct LaraMatchView: View {
                 }
             }
         }
-        .alert("Eagle Composer", isPresented: Binding(
-            get: { errorMessage != nil || savedMessage != nil },
-            set: { presented in
-                if !presented {
-                    errorMessage = nil
-                    savedMessage = nil
-                }
-            }
-        )) {
-            Button(LaraL10n.text(en: "OK", es: "Aceptar")) {
-                errorMessage = nil
-                savedMessage = nil
-            }
-        } message: {
-            Text(errorMessage ?? savedMessage ?? "")
+        .onChange(of: errorMessage) { value in
+            guard let value else { return }
+            EagleNotifications.shared.result(false, title: "Eagle Composer", message: value)
+            errorMessage = nil
+        }
+        .onChange(of: savedMessage) { value in
+            guard let value else { return }
+            EagleNotifications.shared.result(true, title: "Eagle Composer", message: value)
+            savedMessage = nil
         }
     }
 
@@ -1537,7 +1531,8 @@ struct LaraMatchView: View {
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
-            .tint(analysis.tones[1].color)
+            .tint(EagleVisualTheme.actionFill)
+            .foregroundStyle(EagleVisualTheme.actionText)
             .controlSize(.large)
             .disabled(
                 manager.isWorking ||
@@ -1908,7 +1903,8 @@ private struct EagleComposerPreviewView: View {
                             .frame(maxWidth: .infinity)
                     }
                     .buttonStyle(.borderedProminent)
-                    .tint(analysis.tones[1].color)
+                    .tint(EagleVisualTheme.actionFill)
+                    .foregroundStyle(EagleVisualTheme.actionText)
                     .controlSize(.large)
                 }
                 .padding(20)

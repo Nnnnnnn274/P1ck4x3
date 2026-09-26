@@ -41,7 +41,7 @@ struct GestaltFileView: View {
                     mgCurrentDict = try NSMutableDictionary(contentsOf: URL(fileURLWithPath: mgCurrentPath), error: ())
                     mgCacheExtra = mgCurrentDict["CacheExtra"] as? [String : Any] ?? [:]
                 } catch {
-                    Alertinator.shared.alert(title: "Failed to load MobileGestalt!", body: "\(error)")
+                    Alertinator.shared.notice(title: "Failed to load MobileGestalt!", body: "\(error)", succeeded: false)
                 }
             }
             .toolbar {
@@ -73,7 +73,7 @@ struct GestaltFileView: View {
             try FileManager.default.copyItem(at: URL(fileURLWithPath: mgCurrentPath), to: tempURL)
             presentShareSheet(with: tempURL)
         } catch {
-            Alertinator.shared.alert(title: "Failed to export MobileGestalt!", body: "\(error)")
+            Alertinator.shared.notice(title: "Failed to export MobileGestalt!", body: "\(error)", succeeded: false)
         }
     }
     
@@ -89,7 +89,7 @@ struct GestaltFileView: View {
             try mgCurrentData.write(to: tempURL)
             presentShareSheet(with: tempURL)
         } catch {
-            Alertinator.shared.alert(title: "Failed to export MobileGestalt!", body: "\(error)")
+            Alertinator.shared.notice(title: "Failed to export MobileGestalt!", body: "\(error)", succeeded: false)
         }
     }
 }

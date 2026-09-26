@@ -49,13 +49,13 @@ struct dirtyZeroView: View {
     
     func applyTweaks() {
         guard mgr.vfsready else {
-            Alertinator.shared.alert(title: "dirtyZero", body: "VFS is not ready.")
+            Alertinator.shared.notice(title: "dirtyZero", body: "VFS is not ready.", succeeded: false)
             return
         }
 
         let tweaks = tweakArray.flatMap { $0.tweaks }.filter { $0.isOn }
         guard !tweaks.isEmpty else {
-            Alertinator.shared.alert(title: "dirtyZero", body: "No tweaks are selected.")
+            Alertinator.shared.notice(title: "dirtyZero", body: "No tweaks are selected.", succeeded: false)
             return
         }
 
@@ -77,7 +77,7 @@ struct dirtyZeroView: View {
                 mgr.respring()
             })
         } else {
-            Alertinator.shared.alert(title: "dirtyZero finished with errors", body: "\(successCount) write(s) succeeded and \(failCount) failed.")
+            Alertinator.shared.notice(title: "dirtyZero finished with errors", body: "\(successCount) write(s) succeeded and \(failCount) failed.", succeeded: false)
         }
     }
 }

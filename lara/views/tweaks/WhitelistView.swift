@@ -71,11 +71,7 @@ struct WhitelistView: View {
                 }
             }
             .navigationTitle("Whitelist")
-            .alert("Status", isPresented: .constant(status != nil)) {
-                Button("OK") { status = nil }
-            } message: {
-                Text(status ?? "")
-            }
+            .eagleStatus($status, title: "Whitelist")
             .onAppear {
                 if mgr.sbxready {
                     loadall()

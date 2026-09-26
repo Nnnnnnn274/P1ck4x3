@@ -254,11 +254,7 @@ struct ToolsView: View {
             }
         }
         .navigationTitle("Tools")
-        .alert("Status", isPresented: .constant(status != nil)) {
-                Button("OK") { status = nil }
-            } message: {
-                Text(status ?? "")
-            }
+        .eagleStatus($status, title: "Tools")
         .onAppear {
             if mgr.dsready {
                 getaslrstate()

@@ -248,7 +248,7 @@ private struct GalleryThemeCard: View {
                         if isDownloading {
                             ProgressView()
                                 .controlSize(.small)
-                                .tint(.white)
+                                .tint(EagleVisualTheme.actionText)
                         } else {
                             Image(systemName: isImported
                                   ? "arrow.triangle.2.circlepath"
@@ -261,8 +261,8 @@ private struct GalleryThemeCard: View {
                     }
                     .frame(maxWidth: .infinity)
                     .frame(minHeight: 48)
-                    .foregroundStyle(.white)
-                    .background(Color.accentColor)
+                    .foregroundStyle(EagleVisualTheme.actionText)
+                    .background(EagleVisualTheme.actionFill)
                     .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                     .contentShape(Rectangle())
                 }

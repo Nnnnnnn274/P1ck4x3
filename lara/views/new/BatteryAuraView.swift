@@ -133,13 +133,7 @@ struct BatteryAuraView: View {
         .background(Color(uiColor: .systemGroupedBackground))
         .navigationTitle("Battery Aura")
         .navigationBarTitleDisplayMode(.inline)
-        .alert(item: $notice) { notice in
-            Alert(
-                title: Text("Battery Aura"),
-                message: Text(notice.message),
-                dismissButton: .default(Text("OK"))
-            )
-        }
+        .eagleNotice(item: $notice, title: "Battery Aura") { $0.message }
         .overlay {
             if isApplying {
                 ZStack {
@@ -359,10 +353,10 @@ struct BatteryAuraView: View {
                 systemImage: "bolt.fill"
             )
             .font(.headline)
-            .foregroundStyle(.white)
+            .foregroundStyle(EagleVisualTheme.actionText)
             .frame(maxWidth: .infinity)
             .frame(height: 52)
-            .background(auraColor.gradient)
+            .background(EagleVisualTheme.actionFill)
             .clipShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
         }
         .buttonStyle(.plain)

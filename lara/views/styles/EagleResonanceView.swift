@@ -690,13 +690,7 @@ struct EagleResonanceView: View {
         .onDisappear {
             if resonance.isRecording { resonance.cancelRecording() }
         }
-        .alert(item: $styleManager.lastResult) { result in
-            Alert(
-                title: Text(result.title),
-                message: Text(result.message),
-                dismissButton: .default(Text("OK"))
-            )
-        }
+        .eagleNotice(item: $styleManager.lastResult, title: "Resonance") { $0.message }
         .overlay {
             if styleManager.isWorking {
                 EagleBlockingProgress(
@@ -802,7 +796,8 @@ struct EagleResonanceView: View {
                 .frame(height: 48)
             }
             .buttonStyle(.borderedProminent)
-            .tint(resonance.isRecording ? .red : .purple)
+            .tint(resonance.isRecording ? .red : EagleVisualTheme.actionFill)
+            .foregroundStyle(resonance.isRecording ? Color.white : EagleVisualTheme.actionText)
             .disabled(resonance.isRendering)
 
             errorText
@@ -877,7 +872,8 @@ struct EagleResonanceView: View {
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
-                .tint(.purple)
+                .tint(EagleVisualTheme.actionFill)
+                .foregroundStyle(EagleVisualTheme.actionText)
                 .disabled(resonance.taps.count < 5 || resonance.isRendering)
             }
             errorText
@@ -960,7 +956,8 @@ struct EagleResonanceView: View {
                 .frame(height: 50)
             }
             .buttonStyle(.borderedProminent)
-            .tint(.purple)
+            .tint(EagleVisualTheme.actionFill)
+            .foregroundStyle(EagleVisualTheme.actionText)
             .disabled(
                 !mgr.sbxready ||
                 styleManager.isWorking ||

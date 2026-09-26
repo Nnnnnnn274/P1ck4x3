@@ -4,6 +4,7 @@ struct EagleBeta10WelcomeView: View {
     let onContinue: () -> Void
 
     @AppStorage(LaraLanguage.storageKey) private var language = LaraLanguage.english
+    @Environment(\.colorScheme) private var colorScheme
 
     private var support: EagleSupportAssessment {
         eagleSupportAssessment()
@@ -26,17 +27,25 @@ struct EagleBeta10WelcomeView: View {
                 VStack(spacing: 18) {
                     hero
                     currentDeviceCard
-                    releaseHighlightsCard
                     updatesCard
+                    fixesCard
                     compatibilityCard
-                    referenceDeviceCard
-                    safetyNote
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 18)
                 .padding(.bottom, 28)
             }
-            .background(Color(uiColor: .systemGroupedBackground))
+            .background {
+                ZStack {
+                    Color(uiColor: .systemGroupedBackground)
+                    LinearGradient(
+                        colors: [Color.primary.opacity(0.025), .clear, .clear],
+                        startPoint: .topLeading,
+                        endPoint: .center
+                    )
+                }
+                .ignoresSafeArea()
+            }
             .navigationTitle(LaraL10n.text(en: "Updates", es: "Actualizaciones"))
             .navigationBarTitleDisplayMode(.inline)
             .safeAreaInset(edge: .bottom) {
@@ -47,10 +56,14 @@ struct EagleBeta10WelcomeView: View {
                         .frame(minHeight: 52)
                 }
                 .buttonStyle(.borderedProminent)
-                .tint(.indigo)
+                .tint(EagleVisualTheme.actionFill)
+                .foregroundStyle(EagleVisualTheme.actionText)
                 .padding(.horizontal, 20)
                 .padding(.vertical, 12)
-                .background(.ultraThinMaterial)
+                .background(.regularMaterial)
+                .overlay(alignment: .top) {
+                    Divider().opacity(0.32)
+                }
             }
         }
         .interactiveDismissDisabled(true)
@@ -58,176 +71,215 @@ struct EagleBeta10WelcomeView: View {
     }
 
     private var hero: some View {
-        VStack(spacing: 14) {
-            EagleBrandMark(size: 86)
+        ZStack {
+            RoundedRectangle(cornerRadius: 30, style: .continuous)
+                .fill(Color(uiColor: .secondarySystemGroupedBackground))
 
-            VStack(spacing: 5) {
-                Text(LaraL10n.text(en: "Eagle Updates", es: "Actualizaciones de Eagle"))
-                    .font(.system(.largeTitle, design: .rounded, weight: .bold))
-                    .foregroundStyle(EagleVisualTheme.accent)
-                    .multilineTextAlignment(.center)
-
-                Text(LaraL10n.text(en: "VERSION 1.0.3", es: "VERSIÓN 1.0.3"))
-                    .font(.caption.weight(.black))
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 5)
-                    .background(EagleVisualTheme.accent, in: Capsule())
-
-                Text(LaraL10n.text(
-                    en: "Art for your Dynamic Island and Dock, calibrated halos, and a more polished customization experience.",
-                    es: "Arte para tu Dynamic Island y Dock, halos calibrados y una experiencia de personalización más pulida."
-                ))
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-            }
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 18)
-    }
-
-    private var releaseHighlightsCard: some View {
-        welcomeCard {
-            welcomeSectionTitle(
-                LaraL10n.text(en: "Release highlights", es: "Lo destacado"),
-                systemImage: "wand.and.stars",
-                color: .pink
+            LinearGradient(
+                colors: [Color.primary.opacity(0.055), .clear, .clear],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
             )
 
-            HStack(spacing: 10) {
-                highlightMetric(
-                    value: "6",
-                    label: LaraL10n.text(en: "Island styles", es: "Estilos Island"),
-                    icon: "capsule.fill",
-                    color: .purple
-                )
-                highlightMetric(
-                    value: "3",
-                    label: LaraL10n.text(en: "Dock themes", es: "Temas Dock"),
-                    icon: "dock.rectangle",
-                    color: .pink
-                )
-                highlightMetric(
-                    value: "1.0.3",
-                    label: LaraL10n.text(en: "Release", es: "Versión"),
-                    icon: "checkmark.seal.fill",
-                    color: .cyan
-                )
+            VStack(spacing: 16) {
+                EagleWordmark(logoSize: 58, nameSize: 34, spacing: 12)
+
+                Text(LaraL10n.text(
+                    en: "A more polished Eagle.",
+                    es: "Una Eagle más pulida."
+                ))
+                    .font(.headline)
+                    .multilineTextAlignment(.center)
+
+                Text("v\(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0.5")  •  \(Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "92")")
+                    .font(.caption.monospacedDigit().weight(.bold))
+                    .foregroundStyle(EagleVisualTheme.secondaryText(for: colorScheme))
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(.primary.opacity(0.065), in: Capsule())
             }
+            .padding(.horizontal, 18)
+            .padding(.vertical, 28)
         }
+        .frame(maxWidth: .infinity)
+        .clipShape(RoundedRectangle(cornerRadius: 30, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 30, style: .continuous)
+                .strokeBorder(EagleVisualTheme.surfaceBorder(for: colorScheme), lineWidth: 1)
+        }
+        .shadow(color: EagleVisualTheme.surfaceShadow(for: colorScheme), radius: 18, y: 8)
     }
 
     private var currentDeviceCard: some View {
         welcomeCard {
-            HStack(alignment: .top, spacing: 13) {
+            HStack(spacing: 13) {
                 Image(systemName: supportSymbol)
                     .font(.title2.weight(.semibold))
                     .foregroundStyle(supportColor)
-                    .frame(width: 34)
+                    .frame(width: 42, height: 42)
+                    .background(supportColor.opacity(0.11), in: RoundedRectangle(cornerRadius: 13, style: .continuous))
                     .accessibilityHidden(true)
 
                 VStack(alignment: .leading, spacing: 6) {
-                    HStack(alignment: .firstTextBaseline) {
-                        Text(LaraL10n.text(en: "This device", es: "Este dispositivo"))
-                            .font(.headline)
-                        Spacer(minLength: 8)
-                        Text(supportTitle)
-                            .font(.caption.weight(.bold))
-                            .foregroundStyle(supportColor)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 4)
-                            .background(supportColor.opacity(0.13), in: Capsule())
+                    ViewThatFits(in: .horizontal) {
+                        HStack(alignment: .firstTextBaseline) {
+                            Text(LaraL10n.text(en: "This device", es: "Este dispositivo"))
+                                .font(.headline)
+                                .fixedSize()
+                            Spacer(minLength: 8)
+                            supportBadge
+                        }
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text(LaraL10n.text(en: "This device", es: "Este dispositivo"))
+                                .font(.headline)
+                            supportBadge
+                        }
                     }
 
                     Text("\(deviceName) · iOS \(systemVersion)")
                         .font(.subheadline.weight(.medium))
 
-                    Text(support.message(spanish: language == .spanish))
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
                 }
             }
             .accessibilityElement(children: .combine)
         }
     }
 
+    private var supportBadge: some View {
+        Text(supportTitle)
+            .font(.caption.weight(.bold))
+            .foregroundStyle(supportColor)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(supportColor.opacity(0.13), in: Capsule())
+            .fixedSize()
+    }
+
     private var updatesCard: some View {
         welcomeCard {
             welcomeSectionTitle(
-                LaraL10n.text(en: "What changed", es: "Qué cambió"),
+                LaraL10n.text(en: "What’s new", es: "Novedades"),
                 systemImage: "sparkles",
-                color: .purple
+                color: .primary
             )
 
             welcomeRow(
-                icon: "capsule.fill",
-                color: .purple,
-                title: LaraL10n.text(en: "Island Gallery", es: "Galería Island"),
+                icon: "play.rectangle.on.rectangle.fill",
+                color: .primary,
+                title: LaraL10n.text(en: "Living previews", es: "Previews con vida"),
                 detail: LaraL10n.text(
-                    en: "Choose from six calibrated art styles. Every image keeps Starlight's verified size and position, with a strong halo sampled from its main color.",
-                    es: "Elige entre seis estilos de arte calibrados. Cada imagen conserva el tamaño y la posición verificados de Starlight, con un halo intenso tomado de su color principal."
+                    en: "Photos, GIFs and videos now enter smoothly and keep their correct framing.",
+                    es: "Fotos, GIFs y videos aparecen con fluidez y mantienen el encuadre correcto."
                 )
             )
 
             welcomeRow(
-                icon: "dock.rectangle",
-                color: .pink,
-                title: LaraL10n.text(en: "Dock Gallery", es: "Galería Dock"),
+                icon: "arrow.left.and.right.righttriangle.left.righttriangle.right",
+                color: .primary,
+                title: LaraL10n.text(en: "Gallery motion", es: "Movimiento en Gallery"),
                 detail: LaraL10n.text(
-                    en: "Apply Bubblegum, Springfield, or Bikini Bottom behind your Dock apps at the exact verified 382 × 106-point frame without stretching the artwork.",
-                    es: "Aplica Chicle, Springfield o Fondo de Bikini detrás de las apps del Dock con el marco verificado exacto de 382 × 106 puntos, sin estirar el arte."
+                    en: "New swipe, selection and favorite animations in Island and Dock Gallery.",
+                    es: "Nuevas animaciones al deslizar, seleccionar y guardar en Island y Dock Gallery."
                 )
             )
 
             welcomeRow(
-                icon: "eye.slash.fill",
-                color: .indigo,
-                title: LaraL10n.text(en: "Independent system controls", es: "Controles del sistema independientes"),
+                icon: "move.3d",
+                color: .primary,
+                title: LaraL10n.text(en: "Precise placement", es: "Posición precisa"),
                 detail: LaraL10n.text(
-                    en: "Hide or restore the system Island and the Dock background separately while keeping icons, artwork, and the other Aura surface untouched.",
-                    es: "Oculta o restaura por separado la Island del sistema y el fondo del Dock, conservando los iconos, el arte y la otra superficie Aura."
+                    en: "Move Island and Dock artwork in quarter-point steps and restore it instantly.",
+                    es: "Mueve el arte de Island y Dock en pasos de un cuarto de punto y restáuralo al instante."
                 )
             )
 
             welcomeRow(
-                icon: "sparkles.rectangle.stack.fill",
-                color: .cyan,
-                title: LaraL10n.text(en: "Living gallery cards", es: "Tarjetas de galería vivas"),
+                icon: "bell.and.waves.left.and.right.fill",
+                color: .primary,
+                title: LaraL10n.text(en: "Eagle notifications", es: "Notificaciones de Eagle"),
                 detail: LaraL10n.text(
-                    en: "Gallery presentations now use color-aware breathing light, a gentle moving sheen, clearer selection feedback, and full Reduce Motion support.",
-                    es: "Las presentaciones de galería ahora usan luz respirante según el color, un barrido suave, selección más clara y compatibilidad completa con Reducir movimiento."
+                    en: "Results appear after each action without shifting the screen.",
+                    es: "Los resultados aparecen después de cada acción sin mover la pantalla."
                 )
+            )
+
+            welcomeRow(
+                icon: "rectangle.bottomthird.inset.filled",
+                color: .primary,
+                title: LaraL10n.text(en: "Clearer navigation", es: "Navegación más clara"),
+                detail: LaraL10n.text(
+                    en: "A translucent tab bar, monochrome controls and a smoother Ready transition.",
+                    es: "Barra translúcida, controles monocromáticos y transición más suave a Listo."
+                )
+            )
+        }
+    }
+
+    private var fixesCard: some View {
+        welcomeCard {
+            welcomeSectionTitle(
+                LaraL10n.text(en: "Corrections", es: "Correcciones"),
+                systemImage: "checkmark.shield",
+                color: .primary
             )
 
             welcomeRow(
                 icon: "checkmark.shield.fill",
                 color: .green,
-                title: LaraL10n.text(en: "Verified state stays accurate", es: "Estado verificado más preciso"),
+                title: LaraL10n.text(en: "Public engines preserved", es: "Motores públicos conservados"),
                 detail: LaraL10n.text(
-                    en: "Island and Dock galleries now stay synchronized with Aura Studio, clear expired SpringBoard sessions, and never keep an outdated active badge.",
-                    es: "Las galerías Island y Dock ahora se sincronizan con Aura Studio, limpian sesiones vencidas de SpringBoard y no conservan indicadores activos desactualizados."
+                    en: "Prepare, theme Apply, Hide Dock and Aura keep their established execution paths.",
+                    es: "Prepare, Aplicar temas, Hide Dock y Aura conservan sus rutas de ejecución establecidas."
                 )
             )
 
             welcomeRow(
-                icon: "iphone.and.arrow.forward",
-                color: .orange,
-                title: LaraL10n.text(en: "TrollStore access improvement", es: "Mejora de acceso con TrollStore"),
+                icon: "photo.on.rectangle.angled",
+                color: .primary,
+                title: LaraL10n.text(en: "Reliable media", es: "Contenido confiable"),
                 detail: LaraL10n.text(
-                    en: "On supported TrollStore installations, Eagle now recognizes existing mobile filesystem access before attempting an unnecessary sandbox transition.",
-                    es: "En instalaciones compatibles con TrollStore, Eagle ahora reconoce el acceso existente al sistema de archivos móvil antes de intentar una transición de sandbox innecesaria."
+                    en: "Previews no longer reuse the previous image and stop cleanly in the background.",
+                    es: "Los previews ya no reutilizan la imagen anterior y se detienen correctamente en segundo plano."
                 )
             )
 
             welcomeRow(
-                icon: "rectangle.3.group.fill",
-                color: .blue,
-                title: LaraL10n.text(en: "Polished customization", es: "Personalización más pulida"),
+                icon: "figure.walk.motion",
+                color: .primary,
+                title: LaraL10n.text(en: "Efficient animation", es: "Animación eficiente"),
                 detail: LaraL10n.text(
-                    en: "Home navigation, action placement, Passcode labels, wallpaper copy, diagnostics, and adaptive light/dark surfaces have been refined throughout the app.",
-                    es: "Se refinaron la navegación de Inicio, la ubicación de acciones, los textos de Código y Fondos, los diagnósticos y las superficies adaptativas claras y oscuras."
+                    en: "Only the featured preview moves; grids remain light and Reduce Motion is respected.",
+                    es: "Solo se mueve el preview destacado; las cuadrículas siguen ligeras y se respeta Reducir movimiento."
+                )
+            )
+
+            welcomeRow(
+                icon: "iphone.gen3",
+                color: .primary,
+                title: LaraL10n.text(en: "Model alignment", es: "Alineación por modelo"),
+                detail: LaraL10n.text(
+                    en: "Island alignment remains corrected for iPhone 15 Pro Max and iPhone 16.",
+                    es: "La alineación de Island mantiene su corrección para iPhone 15 Pro Max y iPhone 16."
+                )
+            )
+
+            welcomeRow(
+                icon: "slider.horizontal.3",
+                color: .primary,
+                title: LaraL10n.text(en: "Focused tools", es: "Herramientas ordenadas"),
+                detail: LaraL10n.text(
+                    en: "Settings and Laboratory Tools now have distinct roles; three unsuitable Island styles were removed from that gallery.",
+                    es: "Ajustes y Laboratory Tools tienen funciones distintas; se retiraron tres estilos inadecuados de Island Gallery."
+                )
+            )
+
+            welcomeRow(
+                icon: "creditcard.fill",
+                color: .primary,
+                title: LaraL10n.text(en: "Readable Card controls", es: "Botones legibles en Tarjetas"),
+                detail: LaraL10n.text(
+                    en: "Light action buttons now use dark text; matching contrast was corrected in related controls.",
+                    es: "Los botones claros ahora usan texto oscuro; se corrigió el contraste en controles relacionados."
                 )
             )
         }
@@ -261,26 +313,15 @@ struct EagleBeta10WelcomeView: View {
 
             Label {
                 Text(LaraL10n.text(
-                    en: "Blocked for safety: unverified iOS 16 builds, releases outside the supported ranges above, and current MIE devices.",
-                    es: "Bloqueados por seguridad: builds no verificados de iOS 16, versiones fuera de los rangos compatibles indicados y dispositivos actuales con MIE."
+                    en: "Availability still follows Eagle’s verified device and iOS matrix.",
+                    es: "La disponibilidad sigue la matriz verificada de dispositivos e iOS de Eagle."
                 ))
                 .font(.footnote)
+                .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
             } icon: {
-                Image(systemName: "exclamationmark.triangle.fill")
-                    .foregroundStyle(.red)
-            }
-
-            Label {
-                Text(LaraL10n.text(
-                    en: "Prepare access is available again on iPhone 16 (iPhone17,3) running iOS 18.5.",
-                    es: "El acceso de Preparar vuelve a estar disponible en iPhone 16 (iPhone17,3) con iOS 18.5."
-                ))
-                .font(.footnote.weight(.semibold))
-                .fixedSize(horizontal: false, vertical: true)
-            } icon: {
-                Image(systemName: "checkmark.shield.fill")
-                    .foregroundStyle(.green)
+                Image(systemName: "shield.checkered")
+                    .foregroundStyle(EagleVisualTheme.accent)
             }
         }
     }
@@ -288,7 +329,7 @@ struct EagleBeta10WelcomeView: View {
     private var referenceDeviceCard: some View {
         welcomeCard {
             welcomeSectionTitle(
-                LaraL10n.text(en: "Primary verified device", es: "Dispositivo principal verificado"),
+                LaraL10n.text(en: "Reference device", es: "Dispositivo de referencia"),
                 systemImage: "iphone.gen3",
                 color: .cyan
             )
@@ -297,8 +338,8 @@ struct EagleBeta10WelcomeView: View {
                 .font(.headline)
 
             Text(LaraL10n.text(
-                en: "This is Eagle's physical reference device. The core Prepare flow, Dynamic Island, Dock, and the new Home Screen effects were developed and verified on this configuration. Other supported combinations can still require model-specific validation.",
-                es: "Este es el dispositivo físico de referencia de Eagle. El flujo principal de Preparar, Dynamic Island, Dock y los nuevos efectos de Inicio fueron desarrollados y verificados en esta configuración. Otras combinaciones compatibles todavía pueden requerir validación específica por modelo."
+                en: "Physical reference for development. Results can vary by device and iOS version.",
+                es: "Referencia física de desarrollo. Los resultados pueden variar según el dispositivo y la versión de iOS."
             ))
                 .font(.footnote)
                 .foregroundStyle(.secondary)
@@ -333,8 +374,9 @@ struct EagleBeta10WelcomeView: View {
         .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
         .overlay {
             RoundedRectangle(cornerRadius: 22, style: .continuous)
-                .strokeBorder(.primary.opacity(0.06), lineWidth: 1)
+                .strokeBorder(EagleVisualTheme.surfaceBorder(for: colorScheme), lineWidth: 1)
         }
+        .shadow(color: EagleVisualTheme.surfaceShadow(for: colorScheme), radius: 12, y: 5)
     }
 
     private func welcomeSectionTitle(
@@ -359,7 +401,7 @@ struct EagleBeta10WelcomeView: View {
                 .font(.body.weight(.semibold))
                 .foregroundStyle(color)
                 .frame(width: 28, height: 28)
-                .background(color.opacity(0.14), in: RoundedRectangle(cornerRadius: 11, style: .continuous))
+                .background(.primary.opacity(0.065), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
                 .accessibilityHidden(true)
 
             VStack(alignment: .leading, spacing: 3) {
@@ -371,34 +413,6 @@ struct EagleBeta10WelcomeView: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
-        .accessibilityElement(children: .combine)
-    }
-
-    private func highlightMetric(
-        value: String,
-        label: String,
-        icon: String,
-        color: Color
-    ) -> some View {
-        VStack(spacing: 7) {
-            Image(systemName: icon)
-                .font(.headline)
-                .foregroundStyle(color)
-                .accessibilityHidden(true)
-            Text(value)
-                .font(.headline.monospacedDigit())
-                .lineLimit(1)
-                .minimumScaleFactor(0.75)
-            Text(label)
-                .font(.caption2.weight(.medium))
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-                .lineLimit(2)
-        }
-        .frame(maxWidth: .infinity)
-        .frame(minHeight: 88)
-        .padding(.horizontal, 6)
-        .background(color.opacity(0.10), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
         .accessibilityElement(children: .combine)
     }
 

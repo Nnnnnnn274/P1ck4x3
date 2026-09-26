@@ -10,6 +10,9 @@ import SwiftUI
 struct CreditsView: View {
     var body: some View {
         List {
+                LinkCreditCell(name: "rit3zh", description: "Dynamic notification interaction · native Eagle adaptation", url: "https://github.com/rit3zh/expo-dynamic-notifications") {
+                    Image(systemName: "bell.badge.fill")
+                }
                 LinkCreditCell(name: "roooot", description: "Main Developer", url: "https://github.com/rooootdev") {
                     LinkCreditIcon(url: "https://github.com/rooootdev.png")
                 }

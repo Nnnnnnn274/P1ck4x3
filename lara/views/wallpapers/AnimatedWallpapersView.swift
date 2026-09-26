@@ -87,21 +87,14 @@ struct AnimatedWallpapersView: View {
         .onDisappear {
             player?.pause()
         }
-        .alert(LaraL10n.text(en: "Animated wallpapers", es: "Fondos animados"), isPresented: Binding(
-            get: { message != nil },
-            set: { if !$0 { message = nil } }
-        )) {
-            if installer.didInstall {
-                Button(LaraL10n.text(en: "Open Wallpapers", es: "Abrir Fondos")) {
-                    message = nil
-                    installer.openWallpaperPicker()
-                }
-                Button(LaraL10n.text(en: "Later", es: "Después"), role: .cancel) { message = nil }
-            } else {
-                Button(LaraL10n.text(en: "OK", es: "Aceptar"), role: .cancel) { message = nil }
-            }
-        } message: {
-            Text(message ?? "")
+        .onChange(of: message) { value in
+            guard let value else { return }
+            let installed = installer.didInstall
+            EagleNotifications.shared.show(title: LaraL10n.text(en: "Animated wallpapers", es: "Fondos animados"),
+                message: value, kind: installed ? .success : .information,
+                actionTitle: installed ? LaraL10n.text(en: "Open Wallpapers", es: "Abrir Fondos") : nil,
+                action: installed ? { installer.openWallpaperPicker() } : nil)
+            message = nil
         }
         .onChange(of: installer.resultMessage) { result in
             if let result { message = result }

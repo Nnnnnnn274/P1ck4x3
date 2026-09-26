@@ -28,6 +28,8 @@ enum EagleAppearanceMode: String, CaseIterable, Identifiable {
 
 enum EagleVisualTheme {
     static let accent = Color(red: 0.16, green: 0.91, blue: 0.47)
+    static let actionFill = Color.primary
+    static let actionText = Color(uiColor: .systemBackground)
 
     static let accentUIColor = UIColor { traits in
         traits.userInterfaceStyle == .dark
@@ -240,7 +242,7 @@ struct EagleWordmark: View {
         HStack(spacing: spacing) {
             EagleBrandMark(size: logoSize, shimmer: false)
 
-            Text("Eagle")
+            Text("P1CK4X3")
                 .font(.system(size: nameSize, weight: .semibold, design: .serif).lowercaseSmallCaps())
                 .tracking(1.5)
                 .foregroundStyle(.primary)
@@ -377,13 +379,15 @@ struct EagleHeaderBar: View {
 
 enum EagleSpectrumStyle {
     static let colors: [Color] = [
-        Color(red: 0.04, green: 0.30, blue: 0.13),
-        Color(red: 0.08, green: 0.57, blue: 0.25),
-        Color(red: 0.16, green: 0.91, blue: 0.47),
-        Color(red: 0.52, green: 1.00, blue: 0.72),
-        Color(red: 0.16, green: 0.91, blue: 0.47),
-        Color(red: 0.08, green: 0.57, blue: 0.25),
-        Color(red: 0.04, green: 0.30, blue: 0.13),
+        .cyan,
+        .blue,
+        .purple,
+        .pink,
+        .red,
+        .orange,
+        .yellow,
+        .green,
+        .cyan,
     ]
 
     static var gradient: LinearGradient {
@@ -397,18 +401,23 @@ enum EagleSpectrumStyle {
     static var wordmarkGradient: LinearGradient {
         LinearGradient(
             colors: [
-                Color(red: 0.03, green: 0.28, blue: 0.12),
-                Color(red: 0.07, green: 0.50, blue: 0.22),
-                Color(red: 0.12, green: 0.76, blue: 0.36),
-                Color(red: 0.20, green: 0.96, blue: 0.52),
-                Color(red: 0.52, green: 1.00, blue: 0.72),
+                Color(red: 0.13, green: 0.72, blue: 0.90),
+                Color(red: 0.19, green: 0.55, blue: 0.96),
+                Color(red: 0.33, green: 0.42, blue: 0.94),
+                Color(red: 0.52, green: 0.34, blue: 0.91),
+                Color(red: 0.74, green: 0.30, blue: 0.85),
+                Color(red: 0.93, green: 0.33, blue: 0.63),
+                Color(red: 0.98, green: 0.44, blue: 0.42),
+                Color(red: 0.99, green: 0.62, blue: 0.30),
             ],
             startPoint: .leading,
             endPoint: .trailing
         )
     }
 
-    static let navigationTintColor = EagleVisualTheme.accentUIColor
+    // Monochrome, adaptive navigation tint (black in light, white in dark) so
+    // Back/Close match the rest of the neutral chrome.
+    static let navigationTintColor = UIColor.label
 
     static func configureGlobalNavigationAppearance() {
         UINavigationBar.appearance().tintColor = navigationTintColor
@@ -481,18 +490,18 @@ struct EagleRainbowSpinner: View {
 
 struct EagleRainbowProgressBar: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.scenePhase) private var scenePhase
 
     let value: Double
     var height: CGFloat = 4
 
     var body: some View {
         TimelineView(.animation(
-            minimumInterval: 1.0 / 45.0,
-            paused: reduceMotion
+            minimumInterval: 1.0 / 30.0,
+            paused: reduceMotion || scenePhase != .active
         )) { context in
-            let phase = reduceMotion
-                ? 0.0
-                : eagleRainbowPhase(at: context.date, duration: 2.4)
+            let time = reduceMotion || scenePhase != .active
+                ? 0 : context.date.timeIntervalSinceReferenceDate
 
             GeometryReader { geometry in
                 let width = max(geometry.size.width, 1)
@@ -502,15 +511,9 @@ struct EagleRainbowProgressBar: View {
                     Capsule(style: .continuous)
                         .fill(Color.secondary.opacity(0.24))
 
-                    HStack(spacing: 0) {
-                        movingGradient.frame(width: width)
-                        movingGradient.frame(width: width)
-                    }
-                    .frame(width: width * 2, alignment: .leading)
-                    .offset(x: -width * phase)
-                    .frame(width: fillWidth, alignment: .leading)
-                    .clipped()
-                    .mask(Capsule(style: .continuous))
+                    Capsule(style: .continuous)
+                        .fill(rainbow(at: time))
+                        .frame(width: fillWidth)
                 }
             }
         }
@@ -526,8 +529,23 @@ struct EagleRainbowProgressBar: View {
         ))
     }
 
-    private var movingGradient: LinearGradient {
-        EagleSpectrumStyle.gradient
+    private func rainbow(at time: TimeInterval) -> LinearGradient {
+        let phase = (time / 7).truncatingRemainder(dividingBy: 1)
+        let motion = phase * 2 * Double.pi
+        let stops = (0...32).map { index -> Gradient.Stop in
+            let location = Double(index) / 32
+            // Both waves complete whole revolutions in the seven-second hue
+            // cycle, so the last frame joins the first without a color jump.
+            let flow = 0.04 * sin(location * .pi * 4 - motion)
+                + 0.02 * sin(location * .pi * 6 + 2 * motion)
+            let hue = (0.5 + location + phase + flow)
+                .truncatingRemainder(dividingBy: 1)
+            return Gradient.Stop(
+                color: Color(hue: hue, saturation: 0.98, brightness: 1),
+                location: location
+            )
+        }
+        return LinearGradient(stops: stops, startPoint: .leading, endPoint: .trailing)
     }
 }
 

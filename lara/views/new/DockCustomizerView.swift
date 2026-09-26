@@ -30,13 +30,7 @@ struct DockCustomizerView: View {
         .background(Color(uiColor: .systemGroupedBackground))
         .navigationTitle("Dock")
         .navigationBarTitleDisplayMode(.inline)
-        .alert(item: $alert) { alert in
-            Alert(
-                title: Text("Dock"),
-                message: Text(alert.message),
-                dismissButton: .default(Text("OK"))
-            )
-        }
+        .eagleNotice(item: $alert, title: "Dock") { $0.message }
         .overlay {
             if isApplying {
                 ZStack {
@@ -87,7 +81,8 @@ struct DockCustomizerView: View {
     /// each icon breathes on its own phase, so the preview feels alive without
     /// distracting. Everything freezes cleanly when Reduce Motion is on.
     private var dockStrip: some View {
-        let compact = selectedCapacity == 6
+        let previewCapacity = EagleStoredThemeValues.dockPreviewCapacity(selectedCapacity)
+        let compact = previewCapacity == 6
         return TimelineView(.animation(paused: reduceMotion)) { context in
             ZStack {
                 AngularGradient(
@@ -100,7 +95,7 @@ struct DockCustomizerView: View {
                 .allowsHitTesting(false)
 
                 HStack(spacing: compact ? 8 : 11) {
-                    ForEach(0..<selectedCapacity, id: \.self) { index in
+                    ForEach(0..<previewCapacity, id: \.self) { index in
                         let glow = reduceMotion ? 0.8 : tileGlow(at: context.date, index: index)
                         RoundedRectangle(cornerRadius: compact ? 10 : 12, style: .continuous)
                             .fill(previewColor(for: index).gradient)
@@ -243,14 +238,14 @@ struct DockCustomizerView: View {
                      : LaraL10n.text(en: "Apply \(selectedCapacity)-Icon Dock", es: "Aplicar Dock de \(selectedCapacity) iconos"))
             }
             .font(.headline)
-            .foregroundStyle(.white)
+            .foregroundStyle(EagleVisualTheme.actionText)
             .frame(maxWidth: .infinity)
             .frame(height: 52)
             .background(
-                Color.accentColor.gradient,
+                EagleVisualTheme.actionFill,
                 in: RoundedRectangle(cornerRadius: 15, style: .continuous)
             )
-            .shadow(color: Color.accentColor.opacity(0.28), radius: 10, y: 4)
+            .shadow(color: Color.primary.opacity(0.12), radius: 10, y: 4)
             .contentShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
         }
         .buttonStyle(DockPressButtonStyle())
@@ -291,20 +286,23 @@ struct DockCustomizerView: View {
 
     private func applySelectedCapacity() {
         guard !isApplying else { return }
-        guard !isdebugged() else {
-            finishWithError(LaraL10n.text(
-                en: "Stop the Xcode run and open P1ck4x3 from the Home Screen before changing the Dock.",
-                es: "Detén la ejecución de Xcode y abre P1ck4x3 desde Inicio antes de cambiar el Dock."
+        guard UIApplication.shared.applicationState == .active,
+              !mgr.dsrunning, !mgr.rcrunning,
+              !mgr.rcSafetyLocked else {
+            finishWithError(mgr.rcLastError ?? LaraL10n.text(
+                en: "Finish the current operation before changing the Dock.",
+                es: "Termina la operación actual antes de cambiar el Dock."
             ))
             return
         }
-        guard !mgr.rcSafetyLocked else {
+        guard capacities.contains(selectedCapacity) else {
             finishWithError(LaraL10n.text(
-                en: "The protected SpringBoard connection is safety locked. Close and reopen P1ck4x3 before retrying.",
-                es: "La conexión protegida de SpringBoard está bloqueada por seguridad. Cierra P1ck4x3 y vuelve a abrirlo antes de reintentar."
+                en: "Choose 4, 5, or 6 Dock icons.",
+                es: "Elige 4, 5 o 6 iconos para el Dock."
             ))
             return
         }
+        let capacity = selectedCapacity
         isApplying = true
 
         let applyWithSession = {
@@ -316,34 +314,29 @@ struct DockCustomizerView: View {
                 return
             }
 
-            let capacity = self.selectedCapacity
-            let label = "Dock capacity \(UUID().uuidString)"
-            guard self.mgr.beginExclusiveRemoteCall(label: label) else {
-                self.finishWithError(LaraL10n.text(
-                    en: "Another protected SpringBoard operation is active. Try again after it finishes.",
-                    es: "Hay otra operación protegida de SpringBoard activa. Inténtalo cuando termine."
+            let operationLabel = "Dock capacity \(UUID().uuidString)"
+            guard self.mgr.beginExclusiveRemoteCall(label: operationLabel, expectedSession: process) else {
+                self.finishWithError(self.mgr.rcLastError ?? LaraL10n.text(
+                    en: "The Dock session is busy or unavailable.",
+                    es: "La sesión del Dock está ocupada o no está disponible."
                 ))
                 return
             }
             DispatchQueue.global(qos: .userInitiated).async {
                 let capacityResult = set_dock_icon_count(process, Int32(capacity))
-                let healthy = process.isHealthy
-                let timedOut = process.lastCallTimedOut
-                let transportError = process.lastError
+                let healthy = process.isHealthy && !process.lastCallTimedOut
                 DispatchQueue.main.async {
-                    self.mgr.endExclusiveRemoteCall(label: label)
-                    self.isApplying = false
-                    if !healthy || timedOut || transportError?.isEmpty == false {
-                        self.mgr.quarantineRemoteCall(
-                            reason: transportError ?? "Dock capacity call became unhealthy"
-                        )
-                        self.alert = EagleDockAlert(message: LaraL10n.text(
-                            en: "The Dock result could not be verified. Close and reopen P1ck4x3 before retrying.",
-                            es: "No se pudo verificar el resultado del Dock. Cierra P1ck4x3 y vuelve a abrirlo antes de reintentar."
-                        ))
-                        return
+                    if !healthy {
+                        self.mgr.quarantineRemoteCall(reason: "Dock capacity session failed verification")
                     }
-                    if capacityResult == 0 {
+                    self.mgr.endExclusiveRemoteCall(label: operationLabel)
+                    self.isApplying = false
+                    if !healthy {
+                        self.alert = EagleDockAlert(message: LaraL10n.text(
+                            en: "The Dock update could not be verified. Fully close and reopen P1ck4x3 before another operation.",
+                            es: "No se pudo verificar el cambio del Dock. Cierra P1ck4x3 completamente y vuelve a abrirlo antes de otra operación."
+                        ))
+                    } else if capacityResult == 0 {
                         self.alert = EagleDockAlert(message: LaraL10n.text(
                             en: "The Dock now accepts \(capacity) icons. Return to the Home Screen and drag apps into the new spaces.",
                             es: "El Dock ahora acepta \(capacity) iconos. Vuelve a la pantalla de inicio y arrastra apps a los espacios nuevos."
@@ -369,7 +362,7 @@ struct DockCustomizerView: View {
         }
 
         mgr.rcinit(process: "SpringBoard") { success in
-            if success || (self.mgr.rcready && self.mgr.sbProc != nil) {
+            if success {
                 applyWithSession()
             } else {
                 let detail = self.mgr.rcLastError?.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -404,8 +397,8 @@ struct DockCustomizerView: View {
             )
         case -5:
             return LaraL10n.text(
-                en: "SpringBoard rejected the main-thread update. No Dock changes were made.",
-                es: "SpringBoard rechazó la actualización principal. No se cambió el Dock."
+                en: "SpringBoard could not confirm the Dock update.",
+                es: "SpringBoard no pudo confirmar el cambio del Dock."
             )
         default:
             return LaraL10n.text(

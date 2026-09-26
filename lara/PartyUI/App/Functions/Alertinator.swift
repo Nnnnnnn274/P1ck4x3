@@ -13,6 +13,11 @@ public class Alertinator {
     public static let shared = Alertinator()
     
     var alertController: UIAlertController?
+
+    public func notice(title: String, body: String, succeeded: Bool? = nil) {
+        EagleNotifications.shared.show(title: title, message: body,
+            kind: succeeded.map { $0 ? .success : .error } ?? .information)
+    }
     
     public func alert(title: String, body: String, showCancel: Bool = true) {
         Task { @MainActor in

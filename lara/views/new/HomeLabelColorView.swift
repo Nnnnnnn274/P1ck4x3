@@ -172,13 +172,7 @@ struct HomeLabelColorView: View {
         .navigationTitle(LaraL10n.text(en: "App Name Color", es: "Color de nombres"))
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(isApplying)
-        .alert(item: $notice) { notice in
-            Alert(
-                title: Text(LaraL10n.text(en: "App Name Color", es: "Color de nombres")),
-                message: Text(notice.message),
-                dismissButton: .default(Text("OK"))
-            )
-        }
+        .eagleNotice(item: $notice, title: LaraL10n.text(en: "App Name Color", es: "Color de nombres")) { $0.message }
         .overlay {
             if isApplying {
                 ZStack {
@@ -383,7 +377,8 @@ struct HomeLabelColorView: View {
             .frame(maxWidth: .infinity, minHeight: 52)
         }
         .buttonStyle(.borderedProminent)
-        .tint(.accentColor)
+        .tint(EagleVisualTheme.actionFill)
+        .foregroundStyle(EagleVisualTheme.actionText)
         .disabled(
             isApplying || !mgr.dsready || mgr.rcSafetyLocked ||
             !supportedDevice || !policyAllowsApply
@@ -574,7 +569,7 @@ struct HomeLabelColorView: View {
             }
 
             let label = "Home Label Color \(UUID().uuidString)"
-            guard mgr.beginExclusiveRemoteCall(label: label) else {
+            guard mgr.beginExclusiveRemoteCall(label: label, expectedSession: process) else {
                 finishBeforeCall(LaraL10n.text(
                     en: "Another protected operation is active. Wait and try again.",
                     es: "Hay otra operación protegida activa. Espera e inténtalo de nuevo."

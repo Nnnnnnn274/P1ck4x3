@@ -83,7 +83,8 @@ enum EagleSupportSnapshot {
 
     private static func sysctlString(_ name: String) -> String? {
         var size = 0
-        guard sysctlbyname(name, nil, &size, nil, 0) == 0, size > 1 else {
+        guard sysctlbyname(name, nil, &size, nil, 0) == 0,
+              size > 1, size <= 4_096 else {
             return nil
         }
 
@@ -91,7 +92,8 @@ enum EagleSupportSnapshot {
         guard sysctlbyname(name, &buffer, &size, nil, 0) == 0 else {
             return nil
         }
-        return String(cString: buffer)
+        let length = buffer.firstIndex(of: 0) ?? buffer.count
+        return String(decoding: buffer[..<length].map { UInt8(bitPattern: $0) }, as: UTF8.self)
     }
 
     private static let timestampFormatter: ISO8601DateFormatter = {

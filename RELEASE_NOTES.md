@@ -1,17 +1,29 @@
-# P1ck4x3 Latest Release
+# P1ck4x3 update (Eagle 1.0.5 base)
 
-P1ck4x3 expands visual customization with dedicated Island and Dock art galleries while keeping every live SpringBoard change isolated, verified, and recoverable.
+P1ck4x3 now includes the Eagle 1.0.5 gallery, visual and stability updates while retaining its own branding and experimental tools.
 
 ## What changed
 
 - Added **Island Gallery** with six calibrated styles: Starlight, Inferno, Horizon, Vortex, Bubblegum, and Traffic.
-- Every Island image uses the same verified Starlight geometry and a fixed halo matched to its dominant color.
-- Added **Dock Gallery** with Bubblegum, Springfield, and Bikini Bottom artwork at the exact 382 × 106-point Dock frame.
-- Added an independent Dock-background visibility control that preserves Dock icons and their touch targets.
-- Gallery presentations now include color-aware light, gentle motion, clearer active feedback, and Reduce Motion support.
-- Synchronized Dock Gallery with Aura Studio so applying or restoring either experience cannot leave a stale active badge.
-- Improved TrollStore preparation by accepting an already available mobile-filesystem path before attempting a sandbox transition.
-- Improved Home organization, action placement, diagnostic presentation, Passcode localization, wallpaper copy, and adaptive light/dark surfaces.
+- Island Gallery now separates **Live**, **Static**, and **Saves**, includes the Island shadow meter, and exposes a clear Apply action.
+- Added **Dock Gallery** with Bubblegum, Springfield, and Bikini Bottom artwork at the exact 382 × 106-point Dock frame, with Live/static themes, Saves, and adjustable glow.
+- Added **Hide Dock + Island** as a dedicated screen. Hide Island uses the persistent system preference; Hide Dock applies verified material recipes, requires a respring, and must be reapplied after a full device restart.
+- Aura Studio no longer carries a New badge. New badges across the other current entries now use a consistent black-and-white design in light and dark appearance.
+- Updated the Updates window with the new galleries, controls, layout corrections, recovery behavior, and stability fixes.
+- Improved Home navigation, action placement, Prepare/Apply visibility, adaptive light/dark surfaces, Passcode localization, wallpaper copy, and diagnostics.
+- Laboratory now opens its advanced controls directly and includes the P1ck4x3 live Control Center accents experiment.
+- Removed P1ck4x3's breadcrumb controls so breadcrumb recovery can be handled separately with Nugget.
+
+## Stability and recovery
+
+- Gallery and Scene Aura operations verify SpringBoard session ownership before reading session properties. Expired or replaced sessions are rejected without entering the native call.
+- Repeated taps, cancellation, background transitions, and unfinished operations release their locks safely.
+- Island, Dock, and Aura saved flags reject invalid integer values instead of trapping during conversion.
+- Dock Gallery rejects non-finite glow values before native conversion and keeps the applied intensity consistent with the stored value.
+- Dock preview capacity is bounded to the supported 4, 5, or 6 icon choices even if an invalid preference was saved.
+- Hide Dock keeps verified originals, checks every write, and restores from recovery data when a partial write occurs.
+- Passcode and Collections transactions retain originals and recover from incomplete changes.
+- Prepare cleanup and existing TrollStore access handling remain from the public release and were regression-tested with the new gallery operations.
 
 ## Compatibility
 
@@ -21,3 +33,16 @@ P1ck4x3 expands visual customization with dedicated Island and Dock art gallerie
 - TrollStore preparation was additionally validated on iPhone 14 Pro Max with iOS 17.0.
 - Live Island and Dock art remains limited to verified iOS 17/18 SpringBoard routes.
 - The IPA is unsigned and must be signed with the user's normal installation method.
+
+## Español
+
+P1ck4x3 ahora incluye las galerías, el diseño y las correcciones de estabilidad de Eagle 1.0.5, manteniendo su identidad y herramientas experimentales.
+
+- **Galería Island:** seis estilos calibrados, filtros Live/Static/Saves, medidor de sombra y botón Aplicar.
+- **Galería Dock:** tres temas al tamaño exacto del Dock, temas Live/estáticos, Saves y brillo ajustable.
+- **Hide Dock + Island:** pantalla independiente. Hide Island conserva su estado después de reiniciar; Hide Dock requiere respring y debe volver a activarse después de un reinicio completo.
+- Aura Studio ya no muestra New. Las etiquetas New restantes usan el mismo diseño blanco y negro en modo claro y oscuro.
+- Se actualizaron las novedades, la visibilidad de Preparar/Aplicar, la recuperación de Hide Dock y la estabilidad al aplicar temas.
+- Se corrigieron sesiones vencidas, toques repetidos, cancelaciones, ajustes inválidos, intensidades no finitas, capacidades fuera de rango y recuperaciones incompletas.
+
+La IPA no está firmada. Debe firmarse con el método habitual de instalación personal.

@@ -93,7 +93,10 @@ private final class ControlCenterThemeExecutor {
         }
 
         let label = "Control Center accent \(UUID().uuidString.prefix(8))"
-        guard manager.beginExclusiveRemoteCall(label: label) else {
+        guard manager.beginExclusiveRemoteCall(
+            label: label,
+            expectedSession: process
+        ) else {
             return failure(
                 en: "Another protected SpringBoard operation is active.",
                 es: "Otra operación protegida de SpringBoard está activa."
