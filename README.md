@@ -145,6 +145,11 @@ Package the release IPA:
 
 The result is written to `build/P1CK4X3.ipa`.
 
+Pushing a version tag such as `v1.0.6` runs the same build and publishes its
+unsigned IPA as a GitHub Release after the build succeeds. The workflow can
+also publish an existing `v*` tag from **Run workflow** by entering it in the
+`release_tag` field.
+
 ## Report a problem
 
 Open the [guided bug report](https://github.com/Nnnnnnn274/P1ck4x3/issues/new?template=bug_report.md)

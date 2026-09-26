@@ -2,6 +2,11 @@ name: Build P1CK4X3 IPA
 
 on:
   workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Existing v* tag to publish after a successful build (leave blank to build only)
+        required: false
+        type: string
   push:
     branches: [main]
     tags: ["v*"]
@@ -24,6 +29,8 @@ jobs:
     steps:
       - name: Check out source
         uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.release_tag || github.ref }}
 
       - name: Show Xcode environment
         run: |
@@ -55,3 +62,46 @@ jobs:
           path: build/xcodebuild.log
           if-no-files-found: warn
           retention-days: 14
+
+  release:
+    name: Publish GitHub release
+    needs: build-ipa
+    if: >-
+      (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')) ||
+      (github.event_name == 'workflow_dispatch' && inputs.release_tag != '')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.release_tag || github.ref_name }}
+
+    steps:
+      - name: Validate release tag
+        shell: bash
+        run: |
+          if [[ ! "$RELEASE_TAG" =~ ^v[0-9] ]]; then
+            echo "Release tag must start with v followed by a number: $RELEASE_TAG" >&2
+            exit 1
+          fi
+
+      - name: Download IPA artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: P1CK4X3-ipa-${{ github.run_number }}
+          path: release
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" release/P1CK4X3.ipa \
+              --repo "$GITHUB_REPOSITORY" \
+              --clobber
+          else
+            gh release create "$RELEASE_TAG" release/P1CK4X3.ipa \
+              --repo "$GITHUB_REPOSITORY" \
+              --verify-tag \
+              --generate-notes \
+              --title "P1CK4X3 $RELEASE_TAG"
+          fi
