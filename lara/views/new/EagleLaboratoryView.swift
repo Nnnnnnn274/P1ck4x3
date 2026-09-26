@@ -17,10 +17,10 @@ struct EagleLaboratoryView: View {
         List {
             if unlocked {
                 Section {
-                    NavigationLink(destination: ControlCenterThemesView()) {
+                    NavigationLink(destination: LockScreenAccentsView()) {
                         Label(
-                            LaraL10n.text(en: "Control Center Accents", es: "Acentos del Centro de control"),
-                            systemImage: "square.grid.2x2.fill"
+                            LaraL10n.text(en: "Lock Screen Accents", es: "Acentos de pantalla bloqueada"),
+                            systemImage: "lock.square.fill"
                         )
                     }
 

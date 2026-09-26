@@ -62,6 +62,7 @@ enum EagleProductFeature: String, CaseIterable, Identifiable {
     case homeIconNeon
     case homeLabelColor
     case controlCenterThemes
+    case lockScreenAccents
     case advancedSystemTools
 
     var id: String { rawValue }
@@ -73,7 +74,8 @@ enum EagleProductFeature: String, CaseIterable, Identifiable {
             return .stable
         case .scenes, .auraPulse, .homeIconNeon, .homeLabelColor:
             return .beta
-        case .islandTint, .controlCenterThemes, .advancedSystemTools:
+        case .islandTint, .controlCenterThemes, .lockScreenAccents,
+                .advancedSystemTools:
             return .experimental
         }
     }
@@ -95,6 +97,8 @@ enum EagleProductFeature: String, CaseIterable, Identifiable {
             return LaraL10n.text(en: "App Name Color", es: "Color de nombres")
         case .controlCenterThemes:
             return LaraL10n.text(en: "Control Center Accents", es: "Acentos del Centro de control")
+        case .lockScreenAccents:
+            return LaraL10n.text(en: "Lock Screen Accents", es: "Acentos de pantalla bloqueada")
         case .advancedSystemTools:
             return LaraL10n.text(en: "Advanced system tools", es: "Herramientas avanzadas del sistema")
         }

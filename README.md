@@ -61,7 +61,7 @@
 | 🌈 **Dock Gallery** | Places static and Live artwork behind Dock apps, with Saves, adjustable glow and precise placement. |
 | 🔤 **App Name Color · Advanced** | Applies a page-owned solid color to app names on the current Home Screen page. |
 | 🧪 **Laboratory** | Reveals advanced offset, Kernelcache and RemoteCall controls when selected in Compatibility. |
-| 🎛️ **Control Center Accents** | Adds temporary Mint, Ocean or Rose borders to recognized Control Center modules on iOS 18. Requires Laboratory; a respring clears the effect. |
+| 🔒 **Lock Screen Accents** | Adds temporary Mint, Ocean or Rose frames to verified Lock Screen clock and quick-action surfaces on iOS 18. Restore or a respring clears the effect. |
 | 🛡️ **P1ck4x3 System** | Adds Guardian checks, Scenes and shareable personalization recipes. |
 
 ### New from Eagle 1.0.5

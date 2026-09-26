@@ -282,13 +282,13 @@ struct SettingsView: View {
                 
                 if destination == .laboratory && advancedToolsAllowed {
                     Section {
-                        NavigationLink(destination: ControlCenterThemesView()) {
+                        NavigationLink(destination: LockScreenAccentsView()) {
                             Label(
                                 LaraL10n.text(
-                                    en: "Control Center Accents",
-                                    es: "Acentos del Centro de control"
+                                    en: "Lock Screen Accents",
+                                    es: "Acentos de pantalla bloqueada"
                                 ),
-                                systemImage: "square.grid.2x2.fill"
+                                systemImage: "lock.square.fill"
                             )
                         }
                     } header: {
@@ -298,8 +298,8 @@ struct SettingsView: View {
                         )
                     } footer: {
                         Text(LaraL10n.text(
-                            en: "Temporary iOS 18 module accents. A respring clears them.",
-                            es: "Acentos temporales para módulos de iOS 18. Un respring los elimina."
+                            en: "Temporary iOS 18 clock and quick-action accents. A respring clears them.",
+                            es: "Acentos temporales para el reloj y los accesos rápidos de iOS 18. Un respring los elimina."
                         ))
                     }
 
