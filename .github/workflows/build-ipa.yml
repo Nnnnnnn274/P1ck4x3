@@ -12,7 +12,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: ipa-\${{ github.workflow }}-\${{ github.ref }}
+  group: ipa-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -42,7 +42,7 @@ jobs:
       - name: Upload IPA
         uses: actions/upload-artifact@v4
         with:
-          name: P1CK4X3-ipa-\${{ github.run_number }}
+          name: P1CK4X3-ipa-${{ github.run_number }}
           path: build/P1CK4X3.ipa
           if-no-files-found: error
           retention-days: 14
@@ -51,7 +51,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: P1CK4X3-build-log-\${{ github.run_number }}
+          name: P1CK4X3-build-log-${{ github.run_number }}
           path: build/xcodebuild.log
           if-no-files-found: warn
           retention-days: 14

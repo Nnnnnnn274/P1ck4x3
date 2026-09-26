@@ -403,6 +403,7 @@ enum EagleResonanceAnalyzer {
     }
 }
 
+@MainActor
 enum EagleResonanceRenderer {
     static func render(_ profile: EagleResonanceProfile) throws -> EagleResonanceAssets {
         let wallpaperSize = AnimatedWallpaperBuilder.recommendedPixelSize()

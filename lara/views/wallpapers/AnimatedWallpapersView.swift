@@ -412,6 +412,7 @@ nonisolated private final class AnimatedWallpaperCancellation: @unchecked Sendab
     }
 }
 
+@MainActor
 final class AnimatedWallpaperInstaller: ObservableObject {
     @Published private(set) var isWorking = false
     @Published private(set) var progress: Double = 0

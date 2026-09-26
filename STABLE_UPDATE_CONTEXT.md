@@ -29,8 +29,8 @@ Puntos para mostrar:
   se publican en el hilo principal.
 - Los parsers y rutas de escritura validan tamanos, offsets, archivos de origen
   y escrituras completas antes de informar exito.
-- Liquid Glass restaura realmente el archivo guardado y SpringBoard Customizer
-  ya no interpreta un exito como una excepcion ni oculta fallos parciales.
+- SpringBoard Customizer ya no interpreta un exito como una excepcion ni
+  oculta fallos parciales.
 - Las opciones avanzadas ya no muestran exito cuando VFS, sandbox o la sesion
   de SpringBoard no estan listos.
 - iOS 16.1, 16.1.1 y 16.2 quedan bloqueados temporalmente hasta tener pruebas
@@ -68,8 +68,8 @@ Display points:
   published on the main thread.
 - Parsers and write paths validate sizes, offsets, source files, and complete
   writes before reporting success.
-- Liquid Glass now restores the saved file, and SpringBoard Customizer no
-  longer treats success as an exception or hides partial failures.
+- SpringBoard Customizer no longer treats success as an exception or hides
+  partial failures.
 - Advanced options no longer report success when VFS, sandbox access, or the
   SpringBoard session is not ready.
 - iOS 16.1, 16.1.1, and 16.2 are temporarily blocked until reliable physical

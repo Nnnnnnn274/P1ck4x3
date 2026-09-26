@@ -17,7 +17,6 @@ enum LaraCapability: String, CaseIterable {
 enum LaraFeature: String, CaseIterable {
     // SpringBoard
     case remoteCallCustomizer
-    case liquidGlass
     case springBoardCustomizer
 
     // Lock Screen
@@ -55,7 +54,7 @@ enum LaraFeature: String, CaseIterable {
         switch self {
         case .remoteCallCustomizer:
             return [[.exploit, .remoteCall]]
-        case .liquidGlass, .springBoardCustomizer, .cardOverwrite,
+        case .springBoardCustomizer, .cardOverwrite,
              .dirtyZero, .fontOverwrite, .customOverwrite:
             return [[.exploit, .vfs]]
         case .passcodeTheme, .appDecrypt, .threeAppBypass, .unblacklist,

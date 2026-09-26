@@ -18,10 +18,6 @@ struct TweaksView: View {
                         NavigationLink("RemoteCall Customizer", destination: RemoteView(mgr: mgr))
                             .disabled(!mgr.rcready)
                     }
-                    if LaraCustomProfile.includes(.liquidGlass) {
-                        NavigationLink("Liquid Glass", destination: LiquidGlassView())
-                            .disabled(!mgr.vfsready)
-                    }
                     if LaraCustomProfile.includes(.springBoardCustomizer) {
                         NavigationLink("SpringBoard Customizer", destination: SpringBoardView(mgr: mgr))
                             .disabled(!mgr.vfsready)

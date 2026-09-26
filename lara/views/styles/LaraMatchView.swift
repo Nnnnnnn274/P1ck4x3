@@ -809,15 +809,24 @@ private struct EagleCompositionAssets {
 private enum EagleCompositionRenderer {
     static func render(
         analysis: LaraMatchAnalysis,
-        intensity: EagleComposerIntensity
+        intensity: EagleComposerIntensity,
+        wallpaperSize: CGSize
     ) throws -> EagleCompositionAssets {
-        let focusedBase = renderWallpaperBase(analysis: analysis, usesSmartFocus: true)
+        let focusedBase = renderWallpaperBase(
+            analysis: analysis,
+            usesSmartFocus: true,
+            target: wallpaperSize
+        )
         let focusedWallpaper = styleWallpaper(
             focusedBase,
             analysis: analysis,
             intensity: intensity
         )
-        let centeredBase = renderWallpaperBase(analysis: analysis, usesSmartFocus: false)
+        let centeredBase = renderWallpaperBase(
+            analysis: analysis,
+            usesSmartFocus: false,
+            target: wallpaperSize
+        )
         let centeredWallpaper = styleWallpaper(
             centeredBase,
             analysis: analysis,
@@ -845,9 +854,9 @@ private enum EagleCompositionRenderer {
 
     private static func renderWallpaperBase(
         analysis: LaraMatchAnalysis,
-        usesSmartFocus: Bool
+        usesSmartFocus: Bool,
+        target: CGSize
     ) -> UIImage {
-        let target = AnimatedWallpaperBuilder.recommendedPixelSize()
         let format = UIGraphicsImageRendererFormat()
         format.scale = 1
         format.opaque = true
@@ -1722,12 +1731,14 @@ struct LaraMatchView: View {
         renderToken = token
         composition = nil
         let chosenIntensity = selectedIntensity ?? intensity
+        let wallpaperSize = AnimatedWallpaperBuilder.recommendedPixelSize()
 
         DispatchQueue.global(qos: .userInitiated).async {
             let result = Result {
                 try EagleCompositionRenderer.render(
                     analysis: analysis,
-                    intensity: chosenIntensity
+                    intensity: chosenIntensity,
+                    wallpaperSize: wallpaperSize
                 )
             }
             DispatchQueue.main.async {

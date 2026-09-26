@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="lara/other/media.xcassets/AppIcon.appiconset/Eagle-Light.png" alt="P1ck4x3 app icon" width="152" height="152">
+  <img src="lara/other/media.xcassets/AppIcon.appiconset/P1CK4X3-Light.png" alt="P1ck4x3 app icon" width="152" height="152">
 
   # P1ck4x3
 

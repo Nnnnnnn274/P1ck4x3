@@ -107,7 +107,6 @@ struct GestaltView: View {
                     PlainToggle(text: "AOD Vibrancy", icon: "rays", minSupportedVersion: 18.0, isOn: mgKeyBinding(["ykpu7qyhqFweVMKtxNylWA"]))
                     PlainToggle(text: "Charge Limit", icon: "battery.100.bolt", minSupportedVersion: 17.0, isOn: mgKeyBinding(["37NVydb//GP/GrhuTN+exg"]))
                     PlainToggle(text: "Boot Chime", icon: "speaker.wave.3", isOn: mgKeyBinding(["QHxt+hGLaBPbQJbXiUJX3w"]))
-                    PlainToggle(text: "Liquid Glass LPM", icon: "app.background.dotted", minSupportedVersion: 19.0, isOn: mgKeyBinding(["SAGvsp6O6kAQ4fEfDJpC4Q"]))
                 }
                 
                 Section(header: HeaderLabel(text: "Hardware-Oriented Features", icon: "iphone")) {
@@ -734,6 +733,7 @@ func loadMutablePlistDictionary(from url: URL) throws -> NSMutableDictionary {
     return dict
 }
 
+@MainActor
 func verifyPlist(_ plist: Any, targetPath: String) throws -> Data {
     let fm = FileManager.default
     

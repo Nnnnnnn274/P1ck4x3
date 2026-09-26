@@ -20,25 +20,15 @@ public struct FancyButtonStyle: PrimitiveButtonStyle {
     }
     
     public func makeBody(configuration: Configuration) -> some View {
-        if #available(iOS 19.0, *) {
-            configuration.label
-                .buttonStyle(.plain)
-                .foregroundStyle(isEnabled ? color : .gray)
-                .frame(maxWidth: useFullWidth ? .infinity : nil)
-                .padding()
-                .glassEffect(.regular.interactive().tint(isEnabled ? color.opacity(0.2) : Color(.systemGray).opacity(0.2)), in: AnyShape(shape))
-                .onTapGesture(perform: configuration.trigger)
-        } else {
-            configuration.label
-                .buttonStyle(.plain)
-                .foregroundStyle(isEnabled ? color : .gray)
-                .frame(maxWidth: useFullWidth ? .infinity : nil)
-                .padding()
-                .background(isEnabled ? color.opacity(0.2) : Color(.systemGray).opacity(0.2), in: AnyShape(shape))
-                .background(.ultraThinMaterial, in: AnyShape(shape))
-                .onTapGesture(perform: configuration.trigger)
-                .modifier(FadeAnimation())
-        }
+        configuration.label
+            .buttonStyle(.plain)
+            .foregroundStyle(isEnabled ? color : .gray)
+            .frame(maxWidth: useFullWidth ? .infinity : nil)
+            .padding()
+            .background(isEnabled ? color.opacity(0.2) : Color(.systemGray).opacity(0.2), in: AnyShape(shape))
+            .background(.ultraThinMaterial, in: AnyShape(shape))
+            .onTapGesture(perform: configuration.trigger)
+            .modifier(FadeAnimation())
     }
     
 }
