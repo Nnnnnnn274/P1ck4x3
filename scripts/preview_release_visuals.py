@@ -116,7 +116,7 @@ swift.write_text(language + theme + badge + components + welcome + stub)
 (app / 'Info.plist').write_bytes(plistlib.dumps({
     'CFBundleIdentifier': 'local.eagle.release-preview', 'CFBundleExecutable': 'EagleReleasePreview',
     'CFBundleName': 'Eagle Release Preview', 'CFBundlePackageType': 'APPL',
-    'CFBundleVersion': '85', 'CFBundleShortVersionString': '1.0.5',
+    'CFBundleVersion': '93', 'CFBundleShortVersionString': '1.0.6',
     'MinimumOSVersion': '16.0', 'UIDeviceFamily': [1], 'UILaunchScreen': {},
     'UIApplicationSceneManifest': {'UIApplicationSupportsMultipleScenes': False},
 }))
